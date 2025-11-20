@@ -7,7 +7,7 @@ from google import genai
 from .config import get_settings
 
 _settings = get_settings()
-_client = genai.Client()
+_client = genai.Client(api_key=_settings.gemini_api_key)
 
 
 def embed_texts(texts: Iterable[str]) -> list[list[float]]:

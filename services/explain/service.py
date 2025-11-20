@@ -12,7 +12,9 @@ from google.genai.errors import ServerError
 
 class ExplanationService:
     def __init__(self):
-        self.client = genai.Client()
+        from services.shared.config import get_settings
+        settings = get_settings()
+        self.client = genai.Client(api_key=settings.gemini_api_key)
         self.schema = {
             "type": "object",
             "properties": {

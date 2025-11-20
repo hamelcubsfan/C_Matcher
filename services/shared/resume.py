@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from .config import get_settings
 
 _settings = get_settings()
-_client = genai.Client()
+_client = genai.Client(api_key=_settings.gemini_api_key)
 
 class SkillsResponse(BaseModel):
     skills: list[str]
