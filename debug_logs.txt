@@ -1,0 +1,89 @@
+api-1  | INFO:__main__:Starting database migration...
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | INFO:__main__:Applying migration: 000_init.sql
+api-1  | INFO:__main__:Applying migration: 001_update_dim.sql
+api-1  | INFO:__main__:All migrations completed successfully.
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | INFO:     Started server process [8]
+api-1  | INFO:     Waiting for application startup.
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | Cleared all candidates from database on startup.
+api-1  | Starting background ingestion...
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | INFO:     Application startup complete.
+api-1  | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1  | Fetching jobs from https://boards-api.greenhouse.io/v1/boards/waymo/jobs?content=true...
+api-1  | Filtering out intern job: 2026 intern, phd, machine learning engineer, simulation
+api-1  | Filtering out intern job: 2026 summer intern, bs/ms, compute systems, mechanical engineer
+api-1  | Filtering out intern job: 2026 summer intern, bs/ms, positioning, software engineer
+api-1  | Filtering out intern job: 2026 summer intern, bs/ms, software engineering, commercialization 
+api-1  | Filtering out intern job: 2026 summer intern, bs/ms, software engineer, simulation multiverse
+api-1  | Filtering out intern job: 2026 summer intern, mba, global supply manager
+api-1  | Filtering out intern job: 2026 summer intern, mba, operations strategy and program management
+api-1  | Filtering out intern job: 2026 summer intern, mba, strategic finance
+api-1  | Filtering out intern job: 2026 summer intern, mba, strategy & operations, customer experience
+api-1  | Filtering out intern job: 2026 summer intern, ms, perception
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, compute, compiler
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, due ml 
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, low-bit model quantization
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, ml architecture, software engineer
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, ml compute, hardware engineer
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, research, 3d reconstruction and synthesis
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, rl based model optimization
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, software engineer, learned metrics
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, software engineer, planner reasoning ml/dl
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, software engineer, planner selection
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, software engineer, predictive planner research 
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, systems engineering, sensing and perception technologies
+api-1  | Filtering out intern job: 2026 summer intern, ms/phd, systems engineer, rider comfort 
+api-1  | Filtering out intern job: 2026 summer intern, ms, software engineer, quantitative
+api-1  | Filtering out intern job: 2026 summer intern, phd, data science
+api-1  | Filtering out intern job: 2026 summer intern, phd, data science, planner & perception eval
+api-1  | Filtering out intern job: 2026 summer intern, phd, machine learning engineer, simulation
+api-1  | Filtering out intern job: 2026 summer intern, phd, machine learning research, planning/prediction
+api-1  | Filtering out intern job: 2026 summer intern, phd, ml compilers
+api-1  | Filtering out intern job: 2026 summer intern, phd, ml training infra and efficiency
+api-1  | Filtering out intern job: 2026 summer intern, phd, perception
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, 3d/4d scene reconstruction and understanding
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, behavior modeling
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, coding agents for av planning
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, foundation models
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, multimodal large language models
+api-1  | Filtering out intern job: 2026 summer intern, phd, research, perception foundation models
+api-1  | Filtering out intern job: 2026 summer intern, phd, safety research, human behavior analytics
+api-1  | Filtering out intern job: 2026 summer intern, phd, software engineer, due
+api-1  | Filtering out intern job: 2026 summer intern, phd, software engineer, due ml 
+api-1  | Filtering out intern job: 2026 summer intern, phd, software engineer, predictive planner ml/dl
+api-1  | Filtering out intern job: 2026 summer intern, phd, software engineer, release evaluation
+api-1  | Filtering out intern job: 2026 summer intern, phd, software engineer, strategic selection
+api-1  | Filtering out intern job: international validation program manager
+api-1  | Kept 198 jobs out of 242.
+api-1  | Background ingestion complete. Ingested 198 jobs.
+api-1  | INFO:     192.168.65.1:28026 - "GET / HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28026 - "GET /_next/static/css/63f586ab8d90c6cb.css HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28652 - "GET /_next/static/chunks/892-ba90bbeb6277ae45.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:16782 - "GET /_next/static/chunks/webpack-91b2d14d0f678b80.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:17142 - "GET /_next/static/chunks/23-3252f0bc2d698c9a.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:39010 - "GET /_next/static/chunks/main-app-5c4cfd20af4cd18d.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:51379 - "GET /_next/static/chunks/fd9d1056-d37e50b4175101a4.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28026 - "GET /_next/static/chunks/app/page-2fd5819954b47349.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28026 - "GET / HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28026 - "GET / HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:51379 - "GET /_next/static/chunks/webpack-91b2d14d0f678b80.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28026 - "GET /_next/static/css/63f586ab8d90c6cb.css HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:39010 - "GET /_next/static/chunks/892-ba90bbeb6277ae45.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:17142 - "GET /_next/static/chunks/23-3252f0bc2d698c9a.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:16782 - "GET /_next/static/chunks/main-app-5c4cfd20af4cd18d.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28652 - "GET /_next/static/chunks/app/page-2fd5819954b47349.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:51379 - "GET /_next/static/chunks/fd9d1056-d37e50b4175101a4.js HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28652 - "GET / HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:28652 - "GET / HTTP/1.1" 304 Not Modified
+api-1  | INFO:     192.168.65.1:60405 - "POST /candidates/upload HTTP/1.1" 200 OK
+api-1  | DATABASE_URL set from environment: postgresql+psycopg://postgres:postgres@db:5432/roles
+api-1  | INFO:     192.168.65.1:60405 - "GET /match/candidate/28a4d512-8ce2-4876-8a4f-914d61a3fd67?n=5 HTTP/1.1" 200 OK

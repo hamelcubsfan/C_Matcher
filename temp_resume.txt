@@ -1,0 +1,52 @@
+Sumedh Vijay Naik
++14047406069 |sumedhnaik1598@gmail.com | Atlanta, 30318 | https://linkedin.com/in/sumedhnaik
+EDUCATION
+Georgia Institute of Technology (GaTech) | M.S. (Elec. and Computer Engineering) | CGPA: 4.0 / 4.0 May 2023
+(Statistical ML, Deep Learning, Adv. Programming Techniques, Graph Models in ML, Computer Vision, Image Processing)
+University of Mumbai | Bachelor of Engineering (Electronics and Telecommunications) | CGPA: 9.13 / 10 May 2020
+(Coursework: ML & AI, Computational Intelligence, Robotic Vision, Control Systems, Micro-Processors and Controllers)
+SKILLS AND TECHNOLOGIES
+Python, C++, PyTorch, TensorFlow, ROS, ROS2, OpenCV, Open3D, PCL, Keras, Machine Learning, Deep Learning,
+Computer Vision, Data Science, Image Processing, GitHub, Amazon S3, AWS, MATLAB, Blender3D, IoT, Unity, SQL
+EXPERIENCE
+Lead Computer Vision Engineer (Founding Team), Fyve By Aug 2023 – Present
+• Led development of a LiDAR-based perception system for aircraft hangar safety, integrating Velodyne, RoboSense, and
+Livox sensors and ZED Cameras for robust 3D spatial awareness in dynamic environments
+• Built and optimized perception pipelines on edge platforms (NVIDIA Jetson, Raspberry Pi), from rapid prototyping to
+production-grade deployment with Amazon S3 for low-latency, high-efficiency performance
+• Designed and deployed real-time point cloud processing algorithms for object detection, tracking, denoising, and
+feedback control, achieving sub-5 ms latency on large-scale data
+• Applied and benchmarked SLAM algorithms (Fast-LIO, Fast-LIVO, LIO-SAM) for accurate localization and high-fidelity
+environment reconstruction, reducing drift and increasing mapping accuracy to 99.8%
+• Implemented sensor fusion frameworks using ROS/ROS2 (C++/Python) for multi-sensor data synchronization,
+processing, and TCP-based communication with UI/front-end and Unity systems. Managed data infrastructure,
+including data collection, structured storage, and cloud integration via Amazon S3, and performed data analysis
+• Developing deep learning pipelines for real-time point cloud classification, researching and integrating custom models
+to enhance semantic understanding of environments
+• Standardized system deployments, resolved hardware-software integration issues in the field, and collaborated crossfunctionally to meet system KPIs and latency targets
+Graduate Technical Intern (Machine Learning), Intel Corporation May 2022 – Dec 2022
+• Created a machine learning based sandbox model for aging prediction across device families for performance analysis
+• Analyzed decision boundaries using collected data and designed a custom in-house performance evaluation algorithm
+with 2x more accuracy and 5x faster processing; the organization adopted the project for internal resource monitoring
+• Automated real-time, reliable and efficient High-Speed Test systems, cutting testing time from days to under 5 seconds
+Graduate Research Assistant, CORE Robotics Lab, GaTech Dec 2021 – May 2022
+• For an autonomous Wheelchair Tennis Robot, developed a ZED Vision-based camera network for localization of the
+play-area to enable ball-detection, tracking, trajectory predictions and vehicle movement
+• Used Probabilistic Motion Primitives (ProMP) to sketch a movement path to enable a 7DOF Robot autonomously play
+Ping-Pong with a Human. Also made use of EKF and Human Body Pose Detection to predict the ball trajectory
+PROJECTS
+GAN-based Image Super-Resolution Techniques Aug 2021 – Dec 2021
+• Replicated the latest Super Resolution (SR) research in PyTorch using SRGAN, ESRGAN and Real-ESRGAN network
+• Improvised the content, perceptual and adversarial loss functions, and observed the results of cloaking on SR networks
+Study of Adversarial Attacks on Image Classification DNNs Aug 2021 – Dec 2021
+• Implemented, analyzed, compared the effect of state-of-the-art adversarial attacks on popular image classification DNNs
+• Visualized the difference in the attention using Grad-Cam to observe where the networks look in the pre-final layer
+Sardar Patel Robotics and Automation Committee (SPRAC): Oct 2016 - April 2020
+• Constructed systems and robots for various themed competitions using principles of controls and image processing
+• Worked on complex robot mechanisms, sensor & motor interfacing, error cancellation and decision-making algorithms
+• Designed and constructed manual as well as autonomous robots controlled by controllers or sensory feedbacks
+PAPER PRESENTATIONS (Link)
+• ‘Athletic Mobile Manipulator System for Robotic Wheelchair Tennis’ (IEEE IROS, IEEE RAL) Oct 2023
+• ‘Real-Time Vein Detection and Mapping using Near-Infrared Lights’ (IEEE INDICON, IEEE Xplore) Dec 2021
+• ‘Aquaculture Monitoring and Feedback System’ (IEEE-ISES, IEEE Xplore) Dec 2019
+• ‘Real-Time Asset Tracking using BLE Beacons’ (Global Conference for Advancement in Tech, IEEE Xplore) Oct 2019

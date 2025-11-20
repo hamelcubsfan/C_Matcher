@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: roles
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  api:
+    build: .
+    command: sh -c "python -m services.shared.migrate && uvicorn services.api.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgres@db:5432/roles
+      - GH_BOARD_URL=${GH_BOARD_URL:-https://boards-api.greenhouse.io/v1/boards/waymo/jobs?content=true}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - EMBED_DIM=${EMBED_DIM:-768}
+      - EMBED_MODEL=${EMBED_MODEL:-gemini-embedding-001}
+      - RERANK_PROVIDER=${RERANK_PROVIDER:-local}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+volumes:
+  pgdata:

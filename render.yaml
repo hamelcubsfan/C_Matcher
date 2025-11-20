@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: cmater-app
+    env: docker
+    plan: free
+    region: oregon
+    buildCommand: "./start_local.sh" # Just to ensure executable, but Render uses Dockerfile
+    startCommand: "uvicorn services.api.main:app --host 0.0.0.0 --port 80"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cmater-db
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: EMBED_DIM
+        value: "768"
+
+databases:
+  - name: cmater-db
+    databaseName: roles
+    user: postgres
+    plan: free
+    region: oregon
+    ipAllowList: [] # Allow all for now, or restrict if needed

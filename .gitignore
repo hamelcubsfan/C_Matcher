@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+uploads/
+.cache/
+.mypy_cache/
+.pytest_cache/
+*.log
+.idea/
+.vscode/
+.DS_Store
+node_modules/
+.next/
+apps/web/out/
+*.egg-info/
+

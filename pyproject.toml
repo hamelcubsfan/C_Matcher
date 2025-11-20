@@ -1,0 +1,37 @@
+[project]
+name = "waymo-role-matcher"
+version = "0.1.0"
+description = "Waymo Role Matcher backend services"
+authors = [{name = "Waymo"}]
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy>=2.0",
+    "psycopg[binary]",
+    "pydantic>=2.0",
+    "python-multipart",
+    "requests",
+    "google-genai>=0.3.0",
+    "pgvector>=0.2.3",
+    "pypdf",
+    "python-docx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+    "ruff",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+include = ["services*"]
+exclude = ["apps*", "infra*", "tests*"]
