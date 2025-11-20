@@ -77,20 +77,21 @@ Job spans:
 Must-haves: {', '.join(must_haves)}
 
 INSTRUCTIONS:
-1. **Analyze the Job**: Identify the 3 hardest technical challenges implied by the Job Title and Job Spans.
-2. **Analyze the Candidate**: Find specific evidence in the Resume Spans that proves the candidate can solve those EXACT challenges.
-3. **Generate the Summary**:
+1. **Contextualize for Waymo**: You know this role is at Waymo. Use your internal knowledge of Waymo's stack (Safety-critical C++, real-time systems, large-scale simulation, Bazel) and the AV domain to INFER implicit technical challenges that might be missing from the brief description.
+2. **Analyze the Job**: Identify the 3 hardest technical challenges (explicit OR inferred from the Title/Domain).
+3. **Analyze the Candidate**: Find specific evidence in the Resume Spans that proves the candidate can solve those EXACT challenges.
+4. **Generate the Summary**:
    - You MUST generate a JSON object with a `summary` field.
    - The `summary` field MUST be a Markdown string containing EXACTLY these three sections, in this order:
    
    **Hiring Pitch**
-   [2-3 sentences. Connect specific resume details to job requirements. **BAN FLUFF**. Do not say "aligns with mission" or "extensive experience". Use concrete nouns (e.g. "GM Super Cruise", "C++17", "Kalman Filter").
+   [2-3 sentences. Connect specific resume details to job requirements (both explicit and inferred). **BAN FLUFF**. Do not say "aligns with mission". Use concrete nouns.
     - BAD: "He has 10 years of experience in ADAS."
-    - GOOD: "He led the commercialization of GM Super Cruise (a safety-critical L2 system), directly applicable to our Fault Protection needs. His Boss Kettering Award proves he can ship production-grade autonomy code, not just research prototypes."]
+    - GOOD: "His experience commercializing GM Super Cruise (L2) directly addresses the safety-critical validation needs of the Waymo Driver, even though 'validation' wasn't explicitly listed. His Boss Kettering Award proves he can ship production code."]
 
    **Why it's a match**
-   - [Bullet 1: **Evidence-based mapping**. If you infer a skill (like Fault Protection), EXPLAIN THE INFERENCE. e.g., "Strong evidence of Fault Protection experience via his leadership on GM Super Cruise/Ultra Cruise, which requires rigorous safety validation."]
-   - [Bullet 2: Connect specific resume details (e.g. "NDSEG Fellow", "developed ad selection algos") to job requirements]
+   - [Bullet 1: **Evidence-based mapping**. If you infer a requirement (e.g. "Waymo Planners need MPC"), EXPLAIN THE INFERENCE. e.g., "Waymo Planning requires robust MPC; his PhD thesis on 'Belief-space Guided Navigation' proves deep optimization expertise."]
+   - [Bullet 2: Connect specific resume details to job requirements]
    - [Bullet 3]
 
    **Potential Gaps**
