@@ -20,4 +20,4 @@ COPY --from=web-builder /web/apps/web/out ./apps/web/out
 RUN pip install --upgrade pip \
     && pip install -e .
 
-CMD ["sh", "-c", "python -m services.shared.migrate && uvicorn services.api.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "python -m services.shared.migrate && uvicorn services.api.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
