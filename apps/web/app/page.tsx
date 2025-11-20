@@ -199,6 +199,9 @@ export default function HomePage() {
     }
   };
 
+  const [progress, setProgress] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState('');
+
   const requestMatches = async () => {
     if (!candidate) {
       setBanner({ type: 'error', message: 'Upload a resume before requesting matches.' });
@@ -206,28 +209,61 @@ export default function HomePage() {
     }
     setLoadingMatches(true);
     setBanner(null);
+    setProgress(0);
+    setLoadingMessage('Initializing search...');
+    setMatches([]);
+
     try {
-      const response = await fetch(`${API_BASE}/match/candidate/${candidate.id}?n=5`);
+      const response = await fetch(`${API_BASE}/match/${candidate.id}?limit=5`, {
+        method: 'POST',
+      });
+
       if (!response.ok) {
-        let detail = 'Unable to fetch matches.';
-        try {
-          const payload = await response.json();
-          detail = typeof payload.detail === 'string' ? payload.detail : detail;
-        } catch (error) {
-          /* ignore */
-        }
-        throw new Error(detail);
+        throw new Error(`Match request failed: ${response.statusText}`);
       }
-      const data = (await response.json()) as { results: MatchResult[] };
-      setMatches(data.results ?? []);
-      if (!data.results?.length) {
-        setBanner({ type: 'success', message: 'No immediate matches yet. Try updating the resume or ingesting more jobs.' });
+
+      if (!response.body) {
+        throw new Error('No response body received');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.status) setLoadingMessage(data.status);
+              if (typeof data.progress === 'number') setProgress(data.progress);
+
+              if (data.data) {
+                // Final result
+                setMatches(data.data);
+                if (!data.data.length) {
+                  setBanner({ type: 'success', message: 'No immediate matches yet. Try updating the resume or ingesting more jobs.' });
+                }
+              }
+            } catch (e) {
+              console.error('Error parsing SSE data:', e);
+            }
+          }
+        }
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unexpected error fetching matches.';
       setBanner({ type: 'error', message });
     } finally {
       setLoadingMatches(false);
+      setProgress(0);
     }
   };
 
@@ -336,22 +372,25 @@ export default function HomePage() {
                 Uploaded {toDisplayDate(candidate.created_at)}
               </div>
             </div>
-            <div>
-              <button
-                className="primary-button"
-                type="button"
-                onClick={requestMatches}
-                disabled={loadingMatches}
-              >
-                {loadingMatches ? (
-                  <span className="loading-text">
-                    <span className="spinner"></span>
-                    <LoadingMessages />
-                  </span>
-                ) : (
-                  'Get top matches'
-                )}
-              </button>
+            <div style={{ minWidth: '200px', textAlign: 'right' }}>
+              {loadingMatches ? (
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--waymo-blue)' }}>
+                    {loadingMessage}
+                  </div>
+                  <div className="progress-container">
+                    <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={requestMatches}
+                >
+                  Get top matches
+                </button>
+              )}
             </div>
           </div>
           <div style={{ marginTop: '1.5rem' }}>

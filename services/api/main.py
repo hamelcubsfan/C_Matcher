@@ -230,19 +230,25 @@ def get_candidate(candidate_id: uuid.UUID, session: Session = Depends(get_db_ses
     return CandidateRead.model_validate(candidate)
 
 
-@app.get("/match/candidate/{candidate_id}", response_model=MatchResponse)
-def get_matches(
-    candidate_id: uuid.UUID,
-    n: int = 5,
-    session: Session = Depends(get_db_session),
-) -> MatchResponse:
+from fastapi.responses import StreamingResponse
+import json
+import logging
+logger = logging.getLogger(__name__)
+
+@app.post("/match/{candidate_id}")
+def match_candidate_endpoint(candidate_id: uuid.UUID, limit: int = 5, session: Session = Depends(get_db_session)):
+    """Match a candidate against open jobs."""
     try:
-        results = match_candidate(session, candidate_id, limit=n)
-    except ValueError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return MatchResponse(candidate_id=candidate_id, results=results)
+        def event_generator():
+            for event in match_candidate(session, candidate_id, limit):
+                yield f"data: {json.dumps(event)}\n\n"
+
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Match failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/route/{candidate_id}/{job_id}", response_model=RouteResponse)

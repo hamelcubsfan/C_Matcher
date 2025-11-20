@@ -97,14 +97,17 @@ class MatchService:
             print(f"DEBUG: Building matches for candidate {candidate.id}", flush=True)
             
             # 1. Query Expansion: Get diverse search angles
+            yield {"status": "Generating search queries...", "progress": 5}
             from services.shared.resume import generate_search_queries
             candidate_text = candidate.parsed_profile.get("raw_text", "")
             queries = generate_search_queries(candidate_text)
             
             # 2. Embed all queries
+            yield {"status": "Embedding search queries...", "progress": 10}
             query_embeddings = embed_texts(queries)
             
             # 3. Multi-Vector Retrieval
+            yield {"status": "Retrieving jobs from vector database...", "progress": 15}
             all_retrieved: dict[int, tuple[Job, float]] = {}
             
             for i, embedding in enumerate(query_embeddings):
@@ -142,8 +145,10 @@ class MatchService:
             
             if not jobs:
                 print("DEBUG: No jobs retrieved from DB", flush=True)
-                return []
+                yield {"status": "No jobs found.", "progress": 100, "data": []}
+                return
 
+            yield {"status": "Reranking candidates...", "progress": 25}
             rerank_scores = self.rerank(candidate, list(jobs))
             
             scored = list(zip(jobs, retrieval_scores, rerank_scores))
@@ -162,11 +167,16 @@ class MatchService:
             # FOMO FIX: We will check MORE candidates (50) and NOT stop early.
             # We want to find the absolute best matches in the pool, not just the first 5 good ones.
             candidates_to_check = scored[:50]
+            total_to_check = len(candidates_to_check)
             
             import json
             
             results: list[MatchResult] = []
-            for job, retrieval_score, rerank_score in candidates_to_check:
+            for i, (job, retrieval_score, rerank_score) in enumerate(candidates_to_check):
+                # Calculate progress from 30% to 90%
+                current_progress = 30 + int((i / total_to_check) * 60)
+                yield {"status": f"Analyzing fit for {job.title}...", "progress": current_progress}
+                
                 print(f"DEBUG: Processing Job {job.id} ({job.title}) - Retrieval: {retrieval_score:.4f}", flush=True)
                 
                 # REMOVED EARLY STOPPING to ensure we find the global best matches in the pool
@@ -238,13 +248,16 @@ class MatchService:
             results = results[:top_k]
             
             logger.info(f"Returning {len(results)} matches")
-            return results
+            yield {"status": "Finalizing matches...", "progress": 95}
+            
+            # Final yield with data
+            yield {"status": "Complete", "progress": 100, "data": [r.model_dump() for r in results]}
         except Exception as e:
             logger.error(f"Error building matches: {e}", exc_info=True)
             raise
 
 
-def match_candidate(session: Session, candidate_id: uuid.UUID, limit: int = 5) -> list[MatchResult]:
+def match_candidate(session: Session, candidate_id: uuid.UUID, limit: int = 5) -> Iterator[dict]:
     candidate = session.get(Candidate, candidate_id)
     if candidate is None:
         raise ValueError("Candidate not found")
