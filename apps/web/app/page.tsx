@@ -96,6 +96,31 @@ import ReactMarkdown from 'react-markdown';
 
 // ... (keep types the same)
 
+const LOADING_MESSAGES = [
+  "Expanding search queries...",
+  "Scanning 50+ job descriptions...",
+  "Analyzing semantic fit with Gemini...",
+  "Checking for seniority mismatch...",
+  "Verifying technical domain expertise...",
+  "Ranking top candidates...",
+  "Finalizing hiring pitch...",
+];
+
+function LoadingMessages() {
+  const [index, setIndex] = useState(0);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span>{LOADING_MESSAGES[index]}</span>;
+}
+
+import React from 'react';
+
 export default function HomePage() {
   const [inputMode, setInputMode] = useState<'upload' | 'paste'>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -318,7 +343,14 @@ export default function HomePage() {
                 onClick={requestMatches}
                 disabled={loadingMatches}
               >
-                {loadingMatches ? 'Scoring matches…' : 'Get top matches'}
+                {loadingMatches ? (
+                  <span className="loading-text">
+                    <span className="spinner"></span>
+                    <LoadingMessages />
+                  </span>
+                ) : (
+                  'Get top matches'
+                )}
               </button>
             </div>
           </div>
