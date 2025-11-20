@@ -61,7 +61,7 @@ class ExplanationService:
         job_spans: list[str],
         must_haves: list[str],
     ) -> str:
-        sys_prompt = "Write a concise recruiter note. Do NOT use citations."
+        sys_prompt = "You are a Principal Technical Recruiter pitching a candidate to a skeptical Hiring Manager. You hate fluff. You only care about concrete evidence."
         prompt = f"""
 Resume spans:
 {resume_spans}
@@ -93,19 +93,21 @@ Rules:
 - The `summary` field MUST be a Markdown-formatted string with these exact sections:
   
   **Hiring Pitch**
-  [2-3 sentences. Factual, non-salesy summary. MUST mention specific companies, teams, algorithms, or research topics from their background (e.g. "Experience at Amazon Ads SimEx", "PhD research in Multi-Armed Bandits"). Avoid generic fluff.]
+  [2-3 sentences. **NO FLUFF**. Do not say "The candidate is a great fit." Say exactly WHY. Connect their specific past achievements to the job's hardest problems.
+   - BAD: "He has 10 years of experience in ADAS."
+   - GOOD: "He led the commercialization of GM Super Cruise (a safety-critical L2 system), directly applicable to our Fault Protection needs. His Boss Kettering Award proves he can ship production-grade autonomy code, not just research prototypes."]
 
   **Why it's a match**
-  - [Bullet point 1: Connect specific resume details (e.g. "NDSEG Fellow", "developed ad selection algos") to job requirements]
-  - [Bullet point 2]
-  - [Bullet point 3]
+  - [Bullet 1: **Evidence-based mapping**. If you infer a skill (like Fault Protection), EXPLAIN THE INFERENCE. e.g., "Strong evidence of Fault Protection experience via his leadership on GM Super Cruise/Ultra Cruise, which requires rigorous safety validation."]
+  - [Bullet 2: Connect specific resume details (e.g. "NDSEG Fellow", "developed ad selection algos") to job requirements]
+  - [Bullet 3]
 
   **Potential Gaps**
-  - [Bullet point 1 (mention seniority/domain gaps if any)]
-  - [Bullet point 2]
+  - [Bullet 1 (mention seniority/domain gaps if any)]
+  - [Bullet 2]
 
 - Use clear Markdown bullets. Keep it clean and readable.
-- Total length under 200 words.
+- Total length under 250 words.
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
 """
         try:
