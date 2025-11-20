@@ -24,7 +24,20 @@ class ExplanationService:
                     "items": {
                         "type": "object",
                         "properties": {
-                            "code": {"type": "string"},
+                            "code": {
+                                "type": "string",
+                                "enum": [
+                                    "domain_expertise",
+                                    "technical_skills",
+                                    "leadership_experience",
+                                    "product_commercialization",
+                                    "education",
+                                    "patents",
+                                    "seniority_match",
+                                    "cultural_fit",
+                                    "safety_critical_experience",
+                                ],
+                            },
                             "evidence": {
                                 "type": "array",
                                 "items": {"type": "string"},
@@ -32,17 +45,6 @@ class ExplanationService:
                             "weight": {"type": "number"},
                         },
                         "required": ["code", "weight"],
-                    },
-                },
-                "gaps": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "code": {"type": "string"},
-                            "note": {"type": "string"},
-                        },
-                        "required": ["code", "note"],
                     },
                 },
                 "confidence": {"type": "number"},
@@ -73,7 +75,7 @@ Must-haves: {', '.join(must_haves)}
 Rules:
 - 120 to 180 words
 - Do NOT include span IDs (e.g. (R1), (J1)) in the output text.
-- Call out obvious gaps
+- Call out obvious gaps in the "Potential Gaps" section of the summary.
 - **CRITICAL**: Check for Seniority/Career Stage Mismatch.
   - Evaluate seniority based on **YEARS OF EXPERIENCE**, not just titles (especially for "Founding Engineer" or "Lead" at startups).
   - If Candidate has < 3 years exp and Job is Senior/Staff/Principal: PENALIZE confidence to max 0.5.
@@ -107,6 +109,17 @@ Rules:
   - [Bullet 1 (mention seniority/domain gaps if any)]
   - [Bullet 2]
 
+- **Reasons Codes**: You MUST select `code` values ONLY from this list:
+  - `domain_expertise`
+  - `technical_skills`
+  - `leadership_experience`
+  - `product_commercialization`
+  - `education`
+  - `patents`
+  - `seniority_match`
+  - `cultural_fit`
+  - `safety_critical_experience`
+
 - Use clear Markdown bullets. Keep it clean and readable.
 - Total length under 250 words.
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
@@ -135,8 +148,11 @@ Rules:
                 )
             data = json.loads(response.text)
             summary = data.get("summary", "")
+            # Guard against the model wrapping the inner string in markdown code blocks
+            if summary.strip().startswith("```"):
+                summary = summary.replace("```markdown", "").replace("```", "").strip()
+            
             reasons = data.get("reasons", [])
-            gaps = data.get("gaps", [])
             confidence = data.get("confidence")
         except Exception as e:
             import logging
@@ -144,13 +160,11 @@ Rules:
             logger.error(f"Explanation generation failed: {e}", exc_info=True)
             summary = "Automated explanation unavailable."
             reasons = []
-            gaps = []
             confidence = None
         return json.dumps(
             {
                 "summary": summary,
                 "reasons": reasons,
-                "gaps": gaps,
                 "confidence": confidence,
             }
         )
