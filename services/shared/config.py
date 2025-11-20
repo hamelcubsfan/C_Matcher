@@ -61,6 +61,7 @@ def get_settings() -> Settings:
         settings.database_url = f"postgresql+psycopg://{auth}@{host}:{port}/{dbname}"
     else:
         # Default for local development
+        print("WARNING: DATABASE_URL not found in environment. Available keys:", list(os.environ.keys()), file=sys.stderr)
         settings.database_url = "postgresql+psycopg://postgres:postgres@localhost:5432/roles"
 
     os.makedirs(settings.upload_root, exist_ok=True)
