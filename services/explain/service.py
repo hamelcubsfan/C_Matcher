@@ -78,6 +78,7 @@ Rules:
   - Evaluate seniority based on **YEARS OF EXPERIENCE**, not just titles (especially for "Founding Engineer" or "Lead" at startups).
   - If Candidate has < 3 years exp and Job is Senior/Staff/Principal: PENALIZE confidence to max 0.5.
   - If Candidate has > 8 years exp and Job is Junior/Entry: PENALIZE confidence to max 0.5.
+  - **Overqualification Check**: If Candidate has > 15 years experience (or Director/VP titles) and Job is a mid-level IC role (e.g. just "Software Engineer" or "Machine Learning Engineer" without Senior/Staff/Principal prefix): PENALIZE confidence to max 0.6.
   - **PhD + Leadership**: If Candidate has a PhD and 3+ years of leadership/mentorship, they are likely qualified for "Tech Lead" or "Manager" roles. Do NOT penalize for lack of formal "Manager" title if they have this.
   - Explicitly mention this mismatch in the summary.
 - **CRITICAL**: Check for Technical Domain Mismatch.
