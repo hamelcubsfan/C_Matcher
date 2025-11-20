@@ -159,8 +159,9 @@ class MatchService:
             # scored.sort(key=lambda x: x[2], reverse=True)
             
             # Don't truncate to top_k yet! We need to find top_k *valid* matches.
-            # We'll check up to 20 candidates to find 5 good ones.
-            candidates_to_check = scored[:20]
+            # FOMO FIX: We will check MORE candidates (50) and NOT stop early.
+            # We want to find the absolute best matches in the pool, not just the first 5 good ones.
+            candidates_to_check = scored[:50]
             
             import json
             
@@ -168,10 +169,10 @@ class MatchService:
             for job, retrieval_score, rerank_score in candidates_to_check:
                 print(f"DEBUG: Processing Job {job.id} ({job.title}) - Retrieval: {retrieval_score:.4f}", flush=True)
                 
-                # Stop if we have enough matches
-                if len(results) >= top_k:
-                    print(f"DEBUG: Found enough matches ({len(results)}), stopping.", flush=True)
-                    break
+                # REMOVED EARLY STOPPING to ensure we find the global best matches in the pool
+                # if len(results) >= top_k:
+                #     print(f"DEBUG: Found enough matches ({len(results)}), stopping.", flush=True)
+                #     break
 
                 explanation_json = self.explain(candidate, job)
                 
@@ -189,17 +190,16 @@ class MatchService:
                     reason_codes = []
 
                 # Filter out low confidence matches based on LLM assessment
-                # The LLM is good at identifying true mismatches (e.g. recruiter vs engineer)
                 if llm_confidence is not None:
                     print(f"DEBUG: Job {job.id} ({job.title}): LLM confidence {llm_confidence}", flush=True)
-                   # Filter by LLM confidence
-                # If explanation failed (confidence is None), we should skip it to avoid bad matches
+                else:
+                    print(f"DEBUG: Job {job.id} ({job.title}): No LLM confidence returned", flush=True)
+
+                # Filter by LLM confidence
                 # User requested strict filtering: only return GOOD matches (> 0.7)
                 if llm_confidence is None or llm_confidence < 0.7:
                     print(f"DEBUG: Skipping match for job {job.id} due to low/missing LLM confidence: {llm_confidence}", flush=True)
                     continue
-                else:
-                    print(f"DEBUG: Job {job.id} ({job.title}): No LLM confidence returned", flush=True)
 
                 # Use LLM confidence if available, otherwise fall back to retrieval/rerank average
                 if llm_confidence is not None:
@@ -230,9 +230,14 @@ class MatchService:
                         reason_codes=reason_codes,
                     )
                 )
-            logger.info(f"Returning {len(results)} matches")
+            
             # Sort by confidence descending so the best matches are first
             results.sort(key=lambda x: x.confidence or 0, reverse=True)
+            
+            # NOW we truncate to top_k, ensuring we kept the BEST ones
+            results = results[:top_k]
+            
+            logger.info(f"Returning {len(results)} matches")
             return results
         except Exception as e:
             logger.error(f"Error building matches: {e}", exc_info=True)
