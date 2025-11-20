@@ -85,8 +85,8 @@ Rules:
   - If Job is "Hardware/FPGA" and Candidate is purely Software: PENALIZE confidence to max 0.4.
   - If Job is "Frontend/Web" and Candidate is purely Backend/ML: PENALIZE confidence to max 0.4.
   - **Recruiting/Talent experience is NOT Engineering experience**.
-    - If Candidate is a Recruiter and Job is an Engineer/Developer/Scientist: PENALIZE confidence to max 0.2.
-    - **EXCEPTION**: If Job Title contains "Recruiter", "Talent", "Sourcing", or "Staffing", it is NOT an Engineering role. Do NOT penalize.
+    - **CRITICAL EXCEPTION**: If Job Title contains "Recruiter", "Talent", "Sourcing", or "Staffing", this IS a relevant role. Do NOT penalize.
+    - Otherwise, if Candidate is a Recruiter and Job is an Engineer/Developer/Scientist: PENALIZE confidence to max 0.2.
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
 
  Formatting:
