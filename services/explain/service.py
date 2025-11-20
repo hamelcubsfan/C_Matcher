@@ -72,10 +72,27 @@ Job spans:
 {job_spans}
 
 Must-haves: {', '.join(must_haves)}
+Must-haves: {', '.join(must_haves)}
+
+INSTRUCTIONS:
+1. You MUST generate a JSON object with a `summary` field.
+2. The `summary` field MUST be a Markdown string containing EXACTLY these three sections, in this order:
+   
+   **Hiring Pitch**
+   [2-3 sentences. Connect specific resume details to job requirements. NO FLUFF.]
+
+   **Why it's a match**
+   - [Bullet 1: Evidence-based mapping]
+   - [Bullet 2]
+
+   **Potential Gaps**
+   - [Bullet 1: Mention seniority/domain gaps if any, or "None detected" if perfect fit]
+
+3. **CRITICAL**: Do NOT skip any section. If there are no gaps, write "None detected".
+4. **CRITICAL**: Do NOT wrap the content in markdown code blocks (```).
+
 Rules:
-- 120 to 180 words
 - Do NOT include span IDs (e.g. (R1), (J1)) in the output text.
-- Call out obvious gaps in the "Potential Gaps" section of the summary.
 - **CRITICAL**: Check for Seniority/Career Stage Mismatch.
   - Evaluate seniority based on **YEARS OF EXPERIENCE**, not just titles (especially for "Founding Engineer" or "Lead" at startups).
   - If Candidate has < 3 years exp and Job is Senior/Staff/Principal: PENALIZE confidence to max 0.5.
@@ -92,23 +109,6 @@ Rules:
     - Otherwise, if Candidate is a Recruiter and Job is an Engineer/Developer/Scientist: PENALIZE confidence to max 0.2.
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
 
- Formatting:
-- The `summary` field MUST be a Markdown-formatted string with these exact sections:
-  
-  **Hiring Pitch**
-  [2-3 sentences. **NO FLUFF**. Do not say "The candidate is a great fit." Say exactly WHY. Connect their specific past achievements to the job's hardest problems.
-   - BAD: "He has 10 years of experience in ADAS."
-   - GOOD: "He led the commercialization of GM Super Cruise (a safety-critical L2 system), directly applicable to our Fault Protection needs. His Boss Kettering Award proves he can ship production-grade autonomy code, not just research prototypes."]
-
-  **Why it's a match**
-  - [Bullet 1: **Evidence-based mapping**. If you infer a skill (like Fault Protection), EXPLAIN THE INFERENCE. e.g., "Strong evidence of Fault Protection experience via his leadership on GM Super Cruise/Ultra Cruise, which requires rigorous safety validation."]
-  - [Bullet 2: Connect specific resume details (e.g. "NDSEG Fellow", "developed ad selection algos") to job requirements]
-  - [Bullet 3]
-
-  **Potential Gaps**
-  - [Bullet 1 (mention seniority/domain gaps if any)]
-  - [Bullet 2]
-
 - **Reasons Codes**: You MUST select `code` values ONLY from this list:
   - `domain_expertise`
   - `technical_skills`
@@ -120,8 +120,6 @@ Rules:
   - `cultural_fit`
   - `safety_critical_experience`
 
-- Use clear Markdown bullets. Keep it clean and readable.
-- Total length under 250 words.
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
 """
         try:
