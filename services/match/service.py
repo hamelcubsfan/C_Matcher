@@ -87,6 +87,7 @@ class MatchService:
             resume_spans=resume_spans,
             job_spans=job_spans,
             must_haves=job.must_have_skills or [],
+            job_title=job.title,
         )
 
     def build_matches(self, candidate: Candidate, top_k: int = 5) -> list[MatchResult]:

@@ -62,9 +62,12 @@ class ExplanationService:
         resume_spans: list[str],
         job_spans: list[str],
         must_haves: list[str],
+        job_title: str,
     ) -> str:
         sys_prompt = "You are a Principal Technical Recruiter pitching a candidate to a skeptical Hiring Manager. You hate fluff. You only care about concrete evidence."
         prompt = f"""
+Job Title: {job_title}
+
 Resume spans:
 {resume_spans}
 
@@ -72,24 +75,29 @@ Job spans:
 {job_spans}
 
 Must-haves: {', '.join(must_haves)}
-Must-haves: {', '.join(must_haves)}
 
 INSTRUCTIONS:
-1. You MUST generate a JSON object with a `summary` field.
-2. The `summary` field MUST be a Markdown string containing EXACTLY these three sections, in this order:
+1. **Analyze the Job**: Identify the 3 hardest technical challenges implied by the Job Title and Job Spans.
+2. **Analyze the Candidate**: Find specific evidence in the Resume Spans that proves the candidate can solve those EXACT challenges.
+3. **Generate the Summary**:
+   - You MUST generate a JSON object with a `summary` field.
+   - The `summary` field MUST be a Markdown string containing EXACTLY these three sections, in this order:
    
    **Hiring Pitch**
-   [2-3 sentences. Connect specific resume details to job requirements. NO FLUFF.]
+   [2-3 sentences. Connect specific resume details to job requirements. **BAN FLUFF**. Do not say "aligns with mission" or "extensive experience". Use concrete nouns (e.g. "GM Super Cruise", "C++17", "Kalman Filter").
+    - BAD: "He has 10 years of experience in ADAS."
+    - GOOD: "He led the commercialization of GM Super Cruise (a safety-critical L2 system), directly applicable to our Fault Protection needs. His Boss Kettering Award proves he can ship production-grade autonomy code, not just research prototypes."]
 
    **Why it's a match**
-   - [Bullet 1: Evidence-based mapping]
-   - [Bullet 2]
+   - [Bullet 1: **Evidence-based mapping**. If you infer a skill (like Fault Protection), EXPLAIN THE INFERENCE. e.g., "Strong evidence of Fault Protection experience via his leadership on GM Super Cruise/Ultra Cruise, which requires rigorous safety validation."]
+   - [Bullet 2: Connect specific resume details (e.g. "NDSEG Fellow", "developed ad selection algos") to job requirements]
+   - [Bullet 3]
 
    **Potential Gaps**
    - [Bullet 1: Mention seniority/domain gaps if any, or "None detected" if perfect fit]
 
-3. **CRITICAL**: Do NOT skip any section. If there are no gaps, write "None detected".
-4. **CRITICAL**: Do NOT wrap the content in markdown code blocks (```).
+4. **CRITICAL**: Do NOT skip any section. If there are no gaps, write "None detected".
+5. **CRITICAL**: Do NOT wrap the content in markdown code blocks (```).
 
 Rules:
 - Do NOT include span IDs (e.g. (R1), (J1)) in the output text.
