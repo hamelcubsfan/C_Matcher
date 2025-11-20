@@ -351,7 +351,7 @@ export default function HomePage() {
             <button className="primary-button" type="submit" disabled={uploading}>
               {uploading ? 'Processing…' : (inputMode === 'upload' ? 'Upload resume' : 'Process text')}
             </button>
-            <small>We&apos;ll index the resume with Gemini embeddings for retrieval.</small>
+            <small style={{ marginLeft: '1rem', color: 'var(--text-muted)' }}>We&apos;ll index the resume with Gemini embeddings for retrieval.</small>
           </div>
         </form>
       </section>
