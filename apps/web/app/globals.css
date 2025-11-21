@@ -405,3 +405,76 @@ h6 {
   font-weight: 500;
   border: 1px solid rgba(0, 0, 0, 0.04);
 }
+
+/* Skill List & Pills */
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.skill-pill {
+  display: inline-block;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--pill-radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--foreground);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  animation: fadeUp 0.5s ease-out backwards;
+}
+
+/* Flashy Hover Effect */
+.skill-pill:hover {
+  transform: scale(1.08);
+  border-color: transparent;
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(90deg, #0056f5, #3ddc91) border-box;
+  border: 1px solid transparent;
+  /* Needed for gradient border trick */
+  box-shadow: 0 4px 12px rgba(0, 86, 245, 0.15);
+}
+
+/* Stagger skill animations */
+.skill-pill:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.skill-pill:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.skill-pill:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.skill-pill:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.skill-pill:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.skill-pill:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+.skill-pill:nth-child(7) {
+  animation-delay: 0.35s;
+}
+
+.skill-pill:nth-child(8) {
+  animation-delay: 0.4s;
+}
+
+.skill-pill:nth-child(9) {
+  animation-delay: 0.45s;
+}
+
+.skill-pill:nth-child(10) {
+  animation-delay: 0.5s;
+}
