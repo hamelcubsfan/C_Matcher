@@ -294,18 +294,16 @@ export default function HomePage() {
 
       <section className="card" style={{ marginTop: '2rem' }}>
         <h2>1. Add a candidate resume</h2>
-        <div className="tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', borderBottom: '1px solid #eee' }}>
+        <div className="tabs">
           <button
             className={`tab-button ${inputMode === 'upload' ? 'active' : ''}`}
             onClick={() => { setInputMode('upload'); setFileError(null); }}
-            style={{ padding: '0.5rem 1rem', border: 'none', background: 'none', cursor: 'pointer', borderBottom: inputMode === 'upload' ? '2px solid var(--waymo-blue)' : 'none', fontWeight: inputMode === 'upload' ? 600 : 400 }}
           >
             Upload File
           </button>
           <button
             className={`tab-button ${inputMode === 'paste' ? 'active' : ''}`}
             onClick={() => { setInputMode('paste'); setFileError(null); }}
-            style={{ padding: '0.5rem 1rem', border: 'none', background: 'none', cursor: 'pointer', borderBottom: inputMode === 'paste' ? '2px solid var(--waymo-blue)' : 'none', fontWeight: inputMode === 'paste' ? 600 : 400 }}
           >
             Paste Text
           </button>
@@ -375,7 +373,7 @@ export default function HomePage() {
             <div style={{ minWidth: '200px', textAlign: 'right' }}>
               {loadingMatches ? (
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--waymo-blue)' }}>
+                  <div style={{ marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 500, color: 'var(--waymo-teal)' }}>
                     {loadingMessage}
                   </div>
                   <div className="progress-container">
@@ -469,7 +467,7 @@ export default function HomePage() {
                       href={match.job.absolute_url}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ marginTop: 'auto', fontWeight: 600, color: 'var(--waymo-blue)' }}
+                      style={{ marginTop: 'auto', fontWeight: 600, color: 'var(--waymo-teal)' }}
                     >
                       Open job posting →
                     </a>
