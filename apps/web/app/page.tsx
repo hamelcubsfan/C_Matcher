@@ -279,17 +279,16 @@ export default function HomePage() {
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Waymo_logo.svg"
             alt="Waymo logo"
-            width={70}
-            height={70}
+            width={90}
+            height={90}
             priority
           />
-          <div className="logo-title">Waymo Role Matcher</div>
         </div>
+        <div className="logo-title">The World’s Most Experienced Driver</div>
         <p className="subtitle">
           Pair every candidate with the teams that need them most. Upload a resume, review the AI-backed match
           explanations, and route promising talent in seconds.
         </p>
-        <div className="tag">Powered by Gemini 2.5 Flash insights</div>
       </section>
 
       <section className="card" style={{ marginTop: '2rem' }}>
@@ -467,9 +466,14 @@ export default function HomePage() {
                       href={match.job.absolute_url}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ marginTop: 'auto', fontWeight: 600, color: 'var(--waymo-teal)' }}
+                      className="arrow-link"
+                      style={{ marginTop: 'auto' }}
                     >
-                      Open job posting →
+                      Open job posting
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
                     </a>
                   )}
                 </article>

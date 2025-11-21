@@ -38,11 +38,25 @@ h6 {
   letter-spacing: -0.02em;
 }
 
+/* Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Cards */
 .card {
   background: #ffffff;
   border-radius: 24px;
-  padding: 2.5rem;
+  padding: 3rem;
+  /* Increased padding */
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -50,12 +64,15 @@ h6 {
 
 .hero-card {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 6rem 2rem;
+  /* Massive padding */
   background: #ffffff;
   border-radius: 32px;
   /* Soft, diffused shadow like Waymo's cards */
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06);
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Entrance animation */
 }
 
 /* Logo & Header */
@@ -63,31 +80,63 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .logo-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 4.5rem;
+  /* Massive font */
+  font-weight: 800;
   color: var(--waymo-navy);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   color: var(--muted);
-  max-width: 600px;
-  margin: 0 auto 2rem auto;
-  line-height: 1.5;
+  max-width: 700px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.6;
   font-weight: 400;
+  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s backwards;
+  /* Staggered */
+}
+
+/* Arrow Links */
+.arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--waymo-teal);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.arrow-link svg {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow-link:hover {
+  color: #007a82;
+}
+
+.arrow-link:hover svg {
+  transform: translateX(4px);
+  /* Sliding arrow */
 }
 
 /* Tabs */
 .tabs {
   display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  gap: 3rem;
+  margin-bottom: 2.5rem;
   border-bottom: 1px solid #e5e5e5;
   justify-content: center;
 }
@@ -96,12 +145,12 @@ h6 {
   padding: 1rem 0.5rem;
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: var(--muted);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   transition: all 0.2s;
-  margin-bottom: -1px;
+  margin-bottom: -2px;
   font-weight: 500;
 }
 
@@ -117,8 +166,8 @@ h6 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 3rem;
+  gap: 1.5rem;
+  padding: 4rem;
   border: 2px dashed #e5e5e5;
   border-radius: 24px;
   cursor: pointer;
@@ -130,8 +179,8 @@ h6 {
 .upload-label:hover {
   border-color: var(--waymo-teal);
   background: #f0fcfd;
-  /* Very light teal tint */
   color: var(--waymo-teal);
+  transform: scale(1.01);
 }
 
 .upload-label input {
@@ -143,18 +192,19 @@ h6 {
   background: var(--waymo-teal);
   color: white;
   border: none;
-  padding: 1rem 2.5rem;
+  padding: 1.2rem 3rem;
+  /* Larger buttons */
   border-radius: var(--pill-radius);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(0, 163, 173, 0.25);
 }
 
 .primary-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 163, 173, 0.35);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 163, 173, 0.35);
   filter: brightness(1.05);
 }
 
@@ -170,32 +220,54 @@ h6 {
 .match-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .match-card {
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 24px;
-  padding: 2rem;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  transition: all 0.2s;
+  gap: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  animation: fadeUp 0.6s ease-out backwards;
+}
+
+/* Stagger match cards */
+.match-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.match-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.match-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.match-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.match-card:nth-child(5) {
+  animation-delay: 0.5s;
 }
 
 .match-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.1);
   border-color: rgba(0, 163, 173, 0.3);
 }
 
 /* Badges & Tags */
 .badge {
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.2rem;
   border-radius: var(--pill-radius);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -220,18 +292,18 @@ h6 {
 
 .tag {
   display: inline-block;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1.2rem;
   background: #f5f5f7;
   color: var(--foreground);
   border-radius: var(--pill-radius);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
 /* Progress Bar */
 .progress-container {
   width: 100%;
-  height: 8px;
+  height: 10px;
   background: #f0f0f0;
   border-radius: var(--pill-radius);
   overflow: hidden;
@@ -248,15 +320,16 @@ h6 {
 .loading-text {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   color: var(--muted);
   font-weight: 500;
+  font-size: 1.1rem;
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 2.5px solid rgba(0, 163, 173, 0.2);
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(0, 163, 173, 0.2);
   border-radius: 50%;
   border-top-color: var(--waymo-teal);
   animation: spin 0.8s ease-in-out infinite;
@@ -270,33 +343,34 @@ h6 {
 
 /* Markdown Content */
 .markdown-content h3 {
-  font-size: 1.1rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   color: var(--waymo-navy);
 }
 
 .markdown-content ul {
   padding-left: 1.25rem;
   color: #424245;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .markdown-content li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .markdown-content p {
-  line-height: 1.6;
+  line-height: 1.7;
   color: #424245;
+  font-size: 1.05rem;
 }
 
 /* Pills for reasons */
 .reason-chip {
   background: #f5f5f7;
-  padding: 0.35rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
   color: #424245;
   font-weight: 500;
   border: 1px solid rgba(0, 0, 0, 0.04);
