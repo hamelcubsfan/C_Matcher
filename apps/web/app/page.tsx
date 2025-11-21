@@ -274,7 +274,7 @@ export default function HomePage() {
 
   return (
     <main>
-      <section className="hero-card card">
+      <section className="hero-section">
         <div className="logo-row">
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Waymo_logo.svg"

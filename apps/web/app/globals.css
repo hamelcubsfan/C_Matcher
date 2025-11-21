@@ -15,7 +15,8 @@
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--background);
+  background: #ffffff;
+  /* Pure white */
   color: var(--foreground);
   padding: 2rem;
   min-height: 100vh;
@@ -23,7 +24,8 @@ body {
 }
 
 main {
-  max-width: 900px;
+  max-width: 1000px;
+  /* Slightly wider for airiness */
   margin: 0 auto;
 }
 
@@ -62,17 +64,16 @@ h6 {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.hero-card {
+/* Hero - De-carded */
+.hero-section {
   text-align: center;
-  padding: 6rem 2rem;
-  /* Massive padding */
-  background: #ffffff;
-  border-radius: 32px;
-  /* Soft, diffused shadow like Waymo's cards */
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.06);
-  margin-bottom: 4rem;
+  padding: 6rem 2rem 4rem 2rem;
+  background: transparent;
+  /* No background */
+  box-shadow: none;
+  /* No shadow */
+  margin-bottom: 2rem;
   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-  /* Entrance animation */
 }
 
 /* Logo & Header */
