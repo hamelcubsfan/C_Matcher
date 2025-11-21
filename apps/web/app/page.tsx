@@ -377,13 +377,27 @@ export default function HomePage() {
                   <div className="progress-container">
                     <div className="progress-bar" style={{ width: `${progress}%` }}></div>
                     <div className="waymo-car" style={{ left: `${progress}%` }}>
-                      <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M36.5 12H34V9.5C34 8.11929 32.8807 7 31.5 7H29.5V5.5C29.5 3.01472 27.4853 1 25 1H15C12.5147 1 10.5 3.01472 10.5 5.5V7H8.5C7.11929 7 6 8.11929 6 9.5V12H3.5C2.11929 12 1 13.1193 1 14.5V19.5C1 20.8807 2.11929 22 3.5 22H6.5C6.5 22.8284 7.17157 23.5 8 23.5C8.82843 23.5 9.5 22.8284 9.5 22H30.5C30.5 22.8284 31.1716 23.5 32 23.5C32.8284 23.5 33.5 22.8284 33.5 22H36.5C37.8807 22 39 20.8807 39 19.5V14.5C39 13.1193 37.8807 12 36.5 12Z" fill="#0056f5" />
-                        <circle cx="8" cy="19" r="2" fill="#3ddc91" />
-                        <circle cx="32" cy="19" r="2" fill="#3ddc91" />
-                        <path d="M20 3V6" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M20 3L23 5" stroke="white" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M20 3L17 5" stroke="white" strokeWidth="2" strokeLinecap="round" />
+                      <svg width="48" height="36" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Wheels */}
+                        <circle cx="12" cy="28" r="5" fill="#1d1d1f" />
+                        <circle cx="36" cy="28" r="5" fill="#1d1d1f" />
+                        <circle cx="12" cy="28" r="2" fill="#555" />
+                        <circle cx="36" cy="28" r="2" fill="#555" />
+
+                        {/* Body */}
+                        <path d="M4 20C4 12 10 8 24 8C38 8 44 12 44 20V24C44 26.2 42.2 28 40 28H8C5.8 28 4 26.2 4 24V20Z" fill="white" stroke="#1d1d1f" strokeWidth="2.5" />
+
+                        {/* Windows */}
+                        <path d="M12 18C12 14 16 12 24 12C32 12 36 14 36 18H12Z" fill="#0056f5" fillOpacity="0.2" />
+
+                        {/* Lidar Dome */}
+                        <path d="M20 6H28V8H20V6Z" fill="#1d1d1f" />
+                        <circle cx="24" cy="5" r="3" fill="#1d1d1f" />
+                        <circle cx="24" cy="5" r="1" fill="#3ddc91" />
+
+                        {/* Headlights/Tailights */}
+                        <circle cx="43" cy="22" r="1.5" fill="#3ddc91" />
+                        <circle cx="5" cy="22" r="1.5" fill="#ff4d4d" />
                       </svg>
                     </div>
                   </div>
