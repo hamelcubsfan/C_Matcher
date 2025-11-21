@@ -279,15 +279,14 @@ export default function HomePage() {
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Waymo_logo.svg"
             alt="Waymo logo"
-            width={90}
-            height={90}
+            width={60}
+            height={60}
             priority
           />
         </div>
-        <div className="logo-title">The World’s Most Experienced Driver</div>
+        <div className="logo-title">Waymo Role Matcher</div>
         <p className="subtitle">
-          Pair every candidate with the teams that need them most. Upload a resume, review the AI-backed match
-          explanations, and route promising talent in seconds.
+          Match candidates to teams in seconds.
         </p>
       </section>
 

@@ -67,12 +67,13 @@ h6 {
 /* Hero - De-carded */
 .hero-section {
   text-align: center;
-  padding: 6rem 2rem 4rem 2rem;
+  padding: 3rem 2rem 2rem 2rem;
+  /* Tighter padding */
   background: transparent;
   /* No background */
   box-shadow: none;
   /* No shadow */
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -81,16 +82,16 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .logo-title {
-  font-size: 4.5rem;
-  /* Massive font */
+  font-size: 3rem;
+  /* Sharp, professional size */
   font-weight: 800;
   color: var(--waymo-navy);
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   line-height: 1.1;
   background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
   background-clip: text;
@@ -99,11 +100,11 @@ h6 {
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--muted);
-  max-width: 700px;
-  margin: 0 auto 3rem auto;
-  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.5;
   font-weight: 400;
   animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s backwards;
   /* Staggered */
