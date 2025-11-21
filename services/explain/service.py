@@ -129,6 +129,12 @@ Rules:
   - `cultural_fit`
   - `safety_critical_experience`
 
+- **Weights**: For each reason, assign a `weight` between 0.0 and 1.0.
+  - 1.0 = Perfect match / Critical requirement met
+  - 0.8 = Strong match
+  - 0.5 = Partial match
+  - DO NOT exceed 1.0.
+
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
 """
         try:
