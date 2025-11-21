@@ -44,37 +44,44 @@ h6 {
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px) scale(0.98);
+    filter: blur(12px);
+    /* Cinematic Blur */
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
-/* Cards */
-.card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 3rem;
-  /* Increased padding */
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
-/* Hero - De-carded */
-.hero-section {
-  text-align: center;
-  padding: 3rem 2rem 2rem 2rem;
-  /* Tighter padding */
-  background: transparent;
-  /* No background */
-  box-shadow: none;
-  /* No shadow */
-  margin-bottom: 1rem;
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 /* Logo & Header */
@@ -84,19 +91,61 @@ h6 {
   justify-content: center;
   gap: 0.75rem;
   margin-bottom: 1rem;
+  animation: float 6s ease-in-out infinite;
+  /* Floating Logo */
 }
 
 .logo-title {
   font-size: 3rem;
-  /* Sharp, professional size */
   font-weight: 800;
   color: var(--waymo-navy);
   letter-spacing: -0.03em;
   line-height: 1.1;
-  background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+  background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 25%, #0056f5 50%, #3ddc91 75%, #1d1d1f 100%);
+  background-size: 300% 300%;
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  animation: shimmer 8s ease infinite;
+  /* Living Gradient */
+}
+
+/* Match Cards Container for 3D */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  perspective: 1000px;
+  /* Enable 3D space */
+}
+
+/* Sleek Card Hover with 3D Tilt */
+.match-card {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  /* Ultra smooth */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.match-card:hover {
+  transform: translateY(-10px) rotateX(2deg) scale(1.02);
+  /* 3D Lift & Tilt */
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 86, 245, 0.1),
+    0 0 20px rgba(0, 86, 245, 0.05);
+  /* Glow */
+  border-color: transparent;
+  z-index: 1;
 }
 
 .subtitle {
@@ -252,41 +301,9 @@ h6 {
   transition: left 0.6s ease-in-out;
 }
 
-/* Sleek Card Hover */
-.match-card {
-  /* ... existing base styles ... */
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  /* Smoother lift */
-}
 
-.match-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  /* Subtle scale */
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 86, 245, 0.1);
-  /* Glassy shadow */
-  border-color: transparent;
-}
 
-/* Match Cards */
-.match-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-}
 
-.match-card {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 24px;
-  padding: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
-  animation: fadeUp 0.6s ease-out backwards;
-  position: relative;
-}
 
 /* Stagger match cards */
 .match-card:nth-child(1) {
@@ -309,13 +326,7 @@ h6 {
   animation-delay: 0.5s;
 }
 
-/* Lidar Glow Effect */
-.match-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 48px rgba(0, 86, 245, 0.15), 0 0 0 2px rgba(61, 220, 145, 0.5);
-  /* Lidar Glow */
-  border-color: transparent;
-}
+
 
 /* Badges & Tags */
 .badge {
