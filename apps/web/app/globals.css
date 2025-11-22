@@ -36,13 +36,11 @@ body::before {
   width: 100%;
   height: 100%;
   background:
-    radial-gradient(circle at 15% 50%, rgba(0, 163, 173, 0.08), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(0, 86, 245, 0.08), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgba(0, 163, 173, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(0, 86, 245, 0.15), transparent 25%);
   z-index: 0;
-  /* Changed from -1 to 0 to sit on top of html background */
   animation: aurora 20s ease-in-out infinite alternate;
   pointer-events: none;
-  /* Ensure clicks pass through */
 }
 
 /* ... */
@@ -53,12 +51,28 @@ body::before {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  background: linear-gradient(135deg, #1d1d1f 30%, #0056f5 100%);
+  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
+  /* Waymo Blue -> Teal */
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  /* Explicitly set color to transparent */
+}
+
+/* ... */
+
+/* Refined Title Gradient */
+.logo-title {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
+  /* Waymo Blue -> Teal */
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 @keyframes aurora {
@@ -179,12 +193,12 @@ h6 {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  background: linear-gradient(135deg, #1d1d1f 30%, #0056f5 100%);
+  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
+  /* Waymo Blue -> Teal */
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  /* Explicitly set color to transparent */
 }
 
 /* Removed duplicate .logo-title block */
