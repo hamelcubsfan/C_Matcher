@@ -12,6 +12,21 @@
   box-sizing: border-box;
 }
 
+html {
+  background: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: transparent;
+  /* Allow aurora to show */
+  color: var(--foreground);
+  padding: 2rem;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
 /* Aurora Background */
 body::before {
   content: '';
@@ -47,17 +62,7 @@ body::before {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
 }
 
-/* Refined Title Gradient */
-.logo-title {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  background: linear-gradient(135deg, #1d1d1f 30%, #0056f5 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
 
 /* Floating Hero */
 .hero-section {
@@ -144,6 +149,20 @@ h6 {
   animation: float 6s ease-in-out infinite;
   /* Floating Logo */
 }
+
+/* Refined Title Gradient */
+.logo-title {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #1d1d1f 30%, #0056f5 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Removed duplicate .logo-title block */
 
 
 
