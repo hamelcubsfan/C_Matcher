@@ -13,23 +13,12 @@
 }
 
 html {
-  background: #ffffff;
-}
-
-body {
-  margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: transparent;
-  /* Allow aurora to show */
-  color: var(--foreground);
-  padding: 2rem;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+  /* Remove white background */
 }
 
-/* Aurora Background */
-body::before {
-  content: '';
+/* Aurora Background - Moved to div */
+.aurora-background {
   position: fixed;
   top: 0;
   left: 0;
@@ -39,40 +28,30 @@ body::before {
     radial-gradient(circle at 15% 50%, rgba(0, 163, 173, 0.15), transparent 25%),
     radial-gradient(circle at 85% 30%, rgba(0, 86, 245, 0.15), transparent 25%);
   z-index: 0;
+  /* Changed to 0 to sit on top of transparent html/body */
   animation: aurora 20s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
-/* ... */
-
-/* Refined Title Gradient */
-.logo-title {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
-  /* Waymo Blue -> Teal */
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+/* Remove body::before to avoid conflicts */
+body::before {
+  display: none;
 }
 
 /* ... */
 
-/* Refined Title Gradient */
+/* Refined Title Gradient - Forced */
 .logo-title {
   font-size: 3rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.1;
-  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
+  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%) !important;
   /* Waymo Blue -> Teal */
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
 }
 
 @keyframes aurora {
