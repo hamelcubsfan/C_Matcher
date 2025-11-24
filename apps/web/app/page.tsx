@@ -620,7 +620,7 @@ export default function HomePage() {
                         tooltip="A stricter check for deep meaning alignment. Scores > 20 are good."
                       />
                       <SensorRing
-                        value={match.confidence_score}
+                        value={match.confidence}
                         label="Overall Fit"
                         tooltip="Gemini's final assessment of the candidate's fit."
                       />
