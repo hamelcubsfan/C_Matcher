@@ -17,6 +17,8 @@ services:
         value: "1"
       - key: EMBED_DIM
         value: "768"
+      - key: APP_SHARED_SECRET
+        value: "waymo_secret"
 
 databases:
   - name: cmater-db
