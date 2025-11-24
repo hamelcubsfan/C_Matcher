@@ -375,6 +375,13 @@ export default function HomePage() {
                     {loadingMessage}
                   </div>
                   <div className="progress-container">
+                    {/* Waypoints */}
+                    <div style={{ position: 'absolute', left: '0%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: '#E5E7EB', borderRadius: '50%', zIndex: 1 }}></div>
+                    <div style={{ position: 'absolute', left: '25%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 25 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
+                    <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 50 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
+                    <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 75 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
+                    <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '16px', height: '16px', border: '4px solid var(--waymo-green)', background: 'white', borderRadius: '50%', zIndex: 1 }}></div>
+
                     <div className="progress-bar" style={{ width: `${progress}%` }}></div>
                     <div className="waymo-car" style={{ left: `${progress}%` }}>
                       <svg width="60" height="30" viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg">

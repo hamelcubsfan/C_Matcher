@@ -1,10 +1,16 @@
 :root {
-  --waymo-teal: #00A3AD;
-  --waymo-navy: #1d1d1f;
-  --background: #ffffff;
-  --foreground: #1d1d1f;
-  --muted: #86868b;
-  --radius: 1.5rem;
+  --waymo-green: #00E89D;
+  /* Caribbean Green */
+  --waymo-blue: #0056f5;
+  /* Sensor Blue */
+  --waymo-navy: #1D1D1F;
+  /* Primary Text */
+  --surface-gray: #F2F4F7;
+  /* Background */
+  --card-white: #FFFFFF;
+  --text-muted: #5E5E62;
+  --radius: 32px;
+  /* Super rounded */
   --pill-radius: 9999px;
 }
 
@@ -13,87 +19,22 @@
 }
 
 html {
-  background: transparent;
-  /* Remove white background */
+  background: var(--surface-gray);
 }
 
-/* Aurora Background - Moved to div */
+body {
+  margin: 0;
+  font-family: 'Outfit', sans-serif;
+  background: var(--surface-gray);
+  color: var(--waymo-navy);
+  padding: 2rem;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Remove Aurora */
 .aurora-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(circle at 15% 50%, rgba(0, 163, 173, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(0, 86, 245, 0.15), transparent 25%);
-  z-index: 0;
-  /* Changed to 0 to sit on top of transparent html/body */
-  animation: aurora 20s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-/* Remove body::before to avoid conflicts */
-body::before {
   display: none;
-}
-
-/* ... */
-
-/* Refined Title Gradient - Forced */
-.logo-title {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%) !important;
-  /* Waymo Blue -> Teal */
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-}
-
-@keyframes aurora {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.1);
-  }
-}
-
-/* Glassmorphism Cards */
-.card,
-.match-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-}
-
-
-
-/* Floating Hero */
-.hero-section {
-  text-align: left;
-  padding: 3rem 2rem 2rem 2rem;
-  background: transparent;
-  box-shadow: none;
-  margin-bottom: 1rem;
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), float 8s ease-in-out infinite;
-}
-
-main {
-  max-width: 1000px;
-  /* Slightly wider for airiness */
-  margin: 0 auto;
-  position: relative;
-  /* Create stacking context */
-  z-index: 1;
-  /* Sit above aurora */
 }
 
 /* Typography */
@@ -104,535 +45,283 @@ h4,
 h5,
 h6 {
   color: var(--waymo-navy);
-  letter-spacing: -0.03em;
-  /* Tighter tracking for modern feel */
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 
 h1 {
   font-weight: 800;
+  font-size: 3.5rem;
 }
 
-/* Animations */
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-    filter: blur(12px);
-    /* Cinematic Blur */
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
-  }
+/* Layout */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
+/* Header */
+.hero-section {
+  text-align: left;
+  padding: 4rem 0 2rem 0;
+  margin-bottom: 1rem;
 }
 
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-5px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-/* Hero - De-carded */
-
-
-/* Logo & Header */
 .logo-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  /* Left Align */
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  animation: float 6s ease-in-out infinite;
-  /* Floating Logo */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Refined Title Gradient */
 .logo-title {
-  font-size: 3rem;
+  font-size: 3.5rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  background: linear-gradient(90deg, #0056f5 0%, #3ddc91 100%);
-  /* Waymo Blue -> Teal */
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(90deg, var(--waymo-blue) 0%, var(--waymo-green) 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-}
-
-/* Removed duplicate .logo-title block */
-
-
-
-/* Match Cards Container for 3D */
-.match-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2.5rem;
-  perspective: 1000px;
-  /* Enable 3D space */
-}
-
-/* Sleek Card Hover with 3D Tilt */
-/* Sleek Card Hover with 3D Tilt */
-.match-card {
-  /* background handled by Glassmorphism block */
-  border-radius: 24px;
-  padding: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  /* Ultra smooth */
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-  position: relative;
-  transform-style: preserve-3d;
-}
-
-.match-card:hover {
-  transform: translateY(-10px) rotateX(2deg) scale(1.02);
-  /* 3D Lift & Tilt */
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.1),
-    0 0 0 1px rgba(0, 86, 245, 0.1),
-    0 0 20px rgba(0, 86, 245, 0.05);
-  /* Glow */
-  border-color: transparent;
-  z-index: 1;
+  /* Gradient text for 2.0 */
 }
 
 .subtitle {
-  font-size: 1.25rem;
-  color: var(--muted);
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  font-weight: 500;
   max-width: 600px;
-  margin: 0 0 2rem 0;
-  /* Left Align */
-  line-height: 1.5;
-  font-weight: 400;
-  animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s backwards;
-  /* Staggered */
+  line-height: 1.4;
 }
 
-/* Arrow Links */
-.arrow-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  color: var(--waymo-teal);
-  text-decoration: none;
-  transition: color 0.2s;
+/* Cards - Solid & Clean */
+.card,
+.match-card {
+  background: var(--card-white);
+  border-radius: var(--radius);
+  padding: 3rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  /* Soft, deep shadow */
+  border: none;
+  margin-top: 2rem;
 }
 
-.arrow-link svg {
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* Buttons - Waymo Green */
+.primary-button {
+  background: var(--waymo-green);
+  color: var(--waymo-navy);
+  border: none;
+  padding: 1.2rem 2.5rem;
+  border-radius: var(--pill-radius);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 232, 157, 0.3);
 }
 
-.arrow-link:hover {
-  color: #007a82;
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 232, 157, 0.4);
 }
 
-.arrow-link:hover svg {
-  transform: translateX(4px);
-  /* Sliding arrow */
+.primary-button:active {
+  transform: translateY(0);
+}
+
+.primary-button:disabled {
+  background: #E5E7EB;
+  color: #9CA3AF;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Inputs */
+input,
+textarea,
+select {
+  background: #F9FAFB;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+input:focus,
+textarea:focus {
+  background: #FFFFFF;
+  border-color: var(--waymo-blue);
+  box-shadow: 0 0 0 4px rgba(0, 86, 245, 0.1);
+  outline: none;
 }
 
 /* Tabs */
 .tabs {
   display: flex;
-  gap: 3rem;
-  margin-bottom: 2.5rem;
-  border-bottom: 1px solid #e5e5e5;
-  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: #F2F4F7;
+  padding: 0.5rem;
+  border-radius: var(--pill-radius);
+  width: fit-content;
 }
 
 .tab-button {
-  padding: 1rem 0.5rem;
-  background: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--pill-radius);
   border: none;
-  font-size: 1.1rem;
-  color: var(--muted);
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 600;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
   transition: all 0.2s;
-  margin-bottom: -2px;
-  font-weight: 500;
 }
 
 .tab-button.active {
-  color: var(--waymo-teal);
-  border-bottom-color: var(--waymo-teal);
-  font-weight: 600;
+  background: #FFFFFF;
+  color: var(--waymo-navy);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* Upload Area */
-.upload-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 4rem;
-  border: 2px dashed #e5e5e5;
-  border-radius: 24px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: #fafafa;
-  color: var(--muted);
-}
-
-.upload-label:hover {
-  border-color: var(--waymo-teal);
-  background: #f0fcfd;
-  color: var(--waymo-teal);
-  transform: scale(1.01);
-}
-
-.upload-label input {
-  display: none;
-}
-
-/* Progress Bar Container */
+/* Route Line Progress Bar */
 .progress-container {
   width: 100%;
-  height: 12px;
-  background: #f0f0f0;
-  border-radius: var(--pill-radius);
-  /* overflow: hidden; REMOVED */
+  height: 8px;
+  /* Thinner line */
+  background: #E5E7EB;
+  /* Track color */
+  border-radius: 4px;
   position: relative;
-  margin-top: 1rem;
-  margin-bottom: 2.5rem;
-  /* Added space for the hanging car */
+  margin-top: 3rem;
+  /* Space for car */
+  margin-bottom: 1rem;
 }
 
-/* Waymo Car Animation - Hanging Below */
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--waymo-blue), var(--waymo-green));
+  border-radius: 4px;
+  transition: width 0.5s linear;
+}
+
+/* Car Driving ON the line */
 .waymo-car {
   position: absolute;
-  top: 14px;
-  /* Hangs below the bar */
-  width: 48px;
+  top: -14px;
+  /* Centered on the line (30px height / 2 - 8px bar / 2 approx) */
+  width: 60px;
   height: auto;
-  transition: left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   transform: translateX(-50%);
+  transition: left 0.5s linear;
   z-index: 10;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-/* Poppy Buttons with Shimmer */
-.primary-button {
-  background: linear-gradient(90deg, #0056f5, #3ddc91);
-  color: white;
-  border: none;
-  padding: 1.2rem 3rem;
-  border-radius: var(--pill-radius);
-  font-size: 1.2rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 4px 12px rgba(0, 86, 245, 0.3);
-  position: relative;
-  overflow: hidden;
+/* Match Cards */
+.match-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
 }
 
-/* Shimmer Effect */
-.primary-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.3) 50%,
-      rgba(255, 255, 255, 0) 100%);
-  transform: skewX(-25deg);
-  transition: none;
+.match-card {
+  padding: 2rem;
+  margin-top: 0;
+  border: 1px solid #E5E7EB;
+  box-shadow: none;
+  transition: all 0.2s ease;
 }
 
-.primary-button:hover::after {
-  left: 200%;
-  transition: left 0.6s ease-in-out;
+.match-card:hover {
+  border-color: var(--waymo-blue);
+  box-shadow: 0 8px 32px rgba(0, 86, 245, 0.08);
+  transform: translateY(-2px);
 }
 
-
-
-
-
-/* Stagger match cards */
-.match-card:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.match-card:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.match-card:nth-child(3) {
-  animation-delay: 0.3s;
-}
-
-.match-card:nth-child(4) {
-  animation-delay: 0.4s;
-}
-
-.match-card:nth-child(5) {
-  animation-delay: 0.5s;
-}
-
-
-
-/* Badges & Tags */
+/* Badges */
 .badge {
-  padding: 0.5rem 1.2rem;
-  border-radius: var(--pill-radius);
-  font-size: 0.8rem;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .confidence-high {
-  background: #e6f7f8;
-  /* Light teal */
-  color: #007a82;
-  /* Darker teal */
+  background: #E6FFFA;
+  color: #00A88D;
 }
 
 .confidence-medium {
-  background: #fff8e1;
-  color: #b88700;
+  background: #FFFBEB;
+  color: #B45309;
 }
 
 .confidence-low {
-  background: #fef2f2;
-  color: #d93025;
+  background: #FEF2F2;
+  color: #DC2626;
 }
 
 .tag {
-  display: inline-block;
-  padding: 0.5rem 1.2rem;
-  background: #f5f5f7;
-  color: var(--foreground);
-  border-radius: var(--pill-radius);
-  font-size: 0.9rem;
-  font-weight: 500;
+  background: #F3F4F6;
+  color: var(--waymo-navy);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-/* Progress Bar */
-.progress-container {
-  width: 100%;
-  height: 12px;
-  /* Slightly thicker for the road */
-  background: #f0f0f0;
-  border-radius: var(--pill-radius);
-  /* overflow: hidden;  <-- REMOVED so the car can sit on top! */
-  position: relative;
-  /* For absolute positioning of car */
-  margin-top: 1rem;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #0056f5, #3ddc91);
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: var(--pill-radius);
-}
-
-/* Waymo Car Animation */
-.waymo-car {
-  position: absolute;
-  top: 14px;
-  /* Hangs below the bar */
-  width: 60px;
-  /* Wider for Jaguar */
-  height: auto;
-  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateX(-50%);
-  /* Center car on the progress point */
-  z-index: 10;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-}
-
-/* Loading Spinner */
-.loading-text {
+/* Upload Area */
+.upload-label {
+  border: 2px dashed #E5E7EB;
+  background: #F9FAFB;
+  border-radius: 24px;
+  padding: 4rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  color: var(--muted);
-  font-weight: 500;
-  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(0, 163, 173, 0.2);
-  border-radius: 50%;
-  border-top-color: var(--waymo-teal);
-  animation: spin 0.8s ease-in-out infinite;
+.upload-label:hover {
+  border-color: var(--waymo-green);
+  background: #F0FDF9;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Markdown Content */
-.markdown-content h3 {
-  font-size: 1.2rem;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: var(--waymo-navy);
-}
-
-.markdown-content ul {
-  padding-left: 1.25rem;
-  color: #424245;
-  line-height: 1.7;
-}
-
-.markdown-content li {
-  margin-bottom: 0.75rem;
-}
-
-.markdown-content p {
-  line-height: 1.7;
-  color: #424245;
-  font-size: 1.05rem;
-}
-
-/* Cards - Base styles handled by Glassmorphism block */
-.card {
-  border-radius: 24px;
-  padding: 3rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Skill List & Pills */
+/* Skill Pills */
 .skill-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .skill-pill {
-  display: inline-block;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  padding: 0.5rem 1.2rem;
-  border-radius: var(--pill-radius);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--foreground);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: default;
-  animation: fadeUp 0.5s ease-out backwards;
+  color: var(--waymo-navy);
 }
 
-/* Flashy Hover Effect */
-.skill-pill:hover {
-  transform: scale(1.08);
-  border-color: transparent;
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(90deg, #0056f5, #3ddc91) border-box;
-  border: 1px solid transparent;
-  /* Needed for gradient border trick */
-  box-shadow: 0 4px 12px rgba(0, 86, 245, 0.15);
+.arrow-link {
+  color: var(--waymo-blue);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-/* Stagger skill animations */
-.skill-pill:nth-child(1) {
-  animation-delay: 0.05s;
-}
-
-.skill-pill:nth-child(2) {
-  animation-delay: 0.1s;
-}
-
-.skill-pill:nth-child(3) {
-  animation-delay: 0.15s;
-}
-
-.skill-pill:nth-child(4) {
-  animation-delay: 0.2s;
-}
-
-.skill-pill:nth-child(5) {
-  animation-delay: 0.25s;
-}
-
-.skill-pill:nth-child(6) {
-  animation-delay: 0.3s;
-}
-
-.skill-pill:nth-child(7) {
-  animation-delay: 0.35s;
-}
-
-.skill-pill:nth-child(8) {
-  animation-delay: 0.4s;
-}
-
-.skill-pill:nth-child(9) {
-  animation-delay: 0.45s;
-}
-
-/* Snappy Inputs */
-input,
-textarea,
-select {
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Springy transition */
-  outline: none;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  transform: scale(1.01);
-  border-color: var(--waymo-teal) !important;
-  box-shadow: 0 0 0 4px rgba(0, 163, 173, 0.15);
-  /* Focus Ring */
-}
-
-/* Punchier Hover Transitions */
-.primary-button,
-.match-card,
-.skill-pill,
-.upload-label {
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  /* Elastic bounce */
-}
-
-.primary-button:active {
-  transform: scale(0.95);
-  /* Deeper press */
+.arrow-link:hover {
+  text-decoration: underline;
 }

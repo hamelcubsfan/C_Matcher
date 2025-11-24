@@ -1,26 +1,26 @@
+```
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
-import { Inter } from 'next/font/google';
+import { Outfit } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const outfit = Outfit({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Waymo Role Matcher',
-  description: 'Upload a resume and discover the best-matching roles across Waymo teams.',
+  description: 'Match candidates to Waymo teams.',
 };
 
 export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="aurora-background" />
+      <body className={outfit.className}>
         {children}
       </body>
     </html>
   );
 }
+```
