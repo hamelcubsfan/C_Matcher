@@ -11,8 +11,9 @@ from pydantic import BaseModel, Field
 class JobRead(BaseModel):
     id: int
     greenhouse_job_id: str
+    requisition_id: str | None = None
     title: str
-    team: str | None
+    team: str | None = None
     location: str | None
     must_have_skills: list[str] = Field(default_factory=list)
     nice_to_have_skills: list[str] = Field(default_factory=list)

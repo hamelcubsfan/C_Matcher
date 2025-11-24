@@ -51,6 +51,7 @@ def normalize(job: dict) -> dict:
 
     return {
         "greenhouse_job_id": str(job.get("id")),
+        "requisition_id": job.get("requisition_id"),
         "title": job.get("title", ""),
         "team": team,
         "location": location,

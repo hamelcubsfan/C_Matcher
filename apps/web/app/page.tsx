@@ -20,6 +20,7 @@ type CandidateRead = {
 type JobRead = {
   id: number;
   greenhouse_job_id: string;
+  requisition_id?: string | null;
   title: string;
   team: string | null;
   location: string | null;
@@ -583,7 +584,7 @@ export default function HomePage() {
                       <div>
                         <h3 style={{ marginBottom: '0.35rem' }}>{match.job.title}</h3>
                         <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                          <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>#{match.job.greenhouse_job_id}</span>
+                          <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>#{match.job.requisition_id || match.job.greenhouse_job_id}</span>
                           {match.job.team ?? 'Team TBD'} {match.job.location ? `• ${match.job.location}` : ''}
                         </div>
                       </div>
