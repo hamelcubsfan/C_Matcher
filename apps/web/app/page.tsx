@@ -310,45 +310,87 @@ export default function HomePage() {
         <form onSubmit={handleUpload}>
           {inputMode === 'upload' ? (
             <>
-              <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                The API stores a text-only copy for matching. PDFs work best, but plain text is supported too.
-              </p>
-              <label className="upload-label">
-                <span role="img" aria-hidden="true">
-                  📄
-                </span>
-                <span>{selectedFile ? selectedFile.name : 'Choose a resume (PDF or text)'}</span>
-                <input type="file" accept=".pdf,.txt,.md,.doc,.docx,.rtf" onChange={handleFileChange} />
-              </label>
+              {/* Upload Section */}
+              <div className="card" style={{ textAlign: 'center' }}>
+                <div className="upload-section">
+                  <label className="upload-label">
+                    <input
+                      type="file"
+                      accept=".txt,.pdf,.md"
+                      onChange={handleFileChange}
+                      disabled={uploading}
+                    />
+                    <div className="upload-icon-wrapper">
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="17 8 12 3 7 8" />
+                        <line x1="12" y1="3" x2="12" y2="15" />
+                      </svg>
+                    </div>
+                    <span className="upload-text-main">Click to upload resume</span>
+                    <span className="upload-text-sub">PDF, TXT, or Markdown</span>
+                  </label>
+                </div>
+
+                <div style={{ marginTop: '2rem', textAlign: 'left' }}>
+                  <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Recruiter Notes (Optional)</h3>
+                  <textarea
+                    className="notes-input"
+                    placeholder="Add context: 'Strong on ML, prefers Seattle', 'Met at conference', etc."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={3}
+                    style={{ width: '100%', resize: 'vertical' }}
+                  />
+                </div>
+
+                <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
+                  <button
+                    className="primary-button"
+                    type="submit"
+                    disabled={!selectedFile || uploading}
+                  >
+                    {uploading ? (
+                      <span className="loading-text">
+                        <div className="spinner"></div>
+                        Scanning...
+                      </span>
+                    ) : (
+                      'Analyze Candidate'
+                    )}
+                  </button>
+                </div>
+              </div>
             </>
           ) : (
-            <textarea
-              value={pasteText}
-              onChange={(e) => setPasteText(e.target.value)}
-              placeholder="Paste resume text here..."
-              style={{ width: '100%', minHeight: '200px', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc', fontFamily: 'monospace' }}
-            />
+            <>
+              <textarea
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                placeholder="Paste resume text here..."
+                style={{ width: '100%', minHeight: '200px', padding: '1rem', borderRadius: '8px', border: '1px solid #ccc', fontFamily: 'monospace' }}
+              />
+              <div style={{ marginTop: '1.5rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                  Recruiter Notes (Optional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add context: 'Strong on ML, prefers Seattle', 'Met at conference', etc."
+                  style={{ width: '100%', minHeight: '80px', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', fontFamily: 'inherit' }}
+                />
+              </div>
+              <div className="actions" style={{ marginTop: '1.5rem' }}>
+                <button className="primary-button" type="submit" disabled={uploading}>
+                  {uploading ? 'Processing…' : 'Process text'}
+                </button>
+                <small style={{ marginLeft: '1rem', color: 'var(--text-muted)' }}>We&apos;ll index the resume with Gemini embeddings for retrieval.</small>
+              </div>
+            </>
           )}
 
-          <div style={{ marginTop: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-              Recruiter Notes (Optional)
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add context: 'Strong on ML, prefers Seattle', 'Met at conference', etc."
-              style={{ width: '100%', minHeight: '80px', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', fontFamily: 'inherit' }}
-            />
-          </div>
-
           {fileError && <div className="alert error" style={{ marginTop: '1rem' }}>{fileError}</div>}
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="primary-button" type="submit" disabled={uploading}>
-              {uploading ? 'Processing…' : (inputMode === 'upload' ? 'Upload resume' : 'Process text')}
-            </button>
-            <small style={{ marginLeft: '1rem', color: 'var(--text-muted)' }}>We&apos;ll index the resume with Gemini embeddings for retrieval.</small>
-          </div>
         </form>
       </section>
 
