@@ -5,12 +5,12 @@
   /* Sensor Blue */
   --waymo-navy: #1D1D1F;
   /* Primary Text */
-  --surface-gray: #F2F4F7;
-  /* Background */
+  --surface-gray: #F9FAFB;
+  /* Lighter, cleaner background */
   --card-white: #FFFFFF;
   --text-muted: #5E5E62;
-  --radius: 32px;
-  /* Super rounded */
+  --radius: 12px;
+  /* Modern, technical radius */
   --pill-radius: 9999px;
 }
 
@@ -45,13 +45,16 @@ h4,
 h5,
 h6 {
   color: var(--waymo-navy);
-  letter-spacing: -0.02em;
-  font-weight: 700;
+  letter-spacing: -0.01em;
+  /* Sharper tracking */
+  font-weight: 600;
+  /* Technical weight */
 }
 
 h1 {
-  font-weight: 800;
-  font-size: 3.5rem;
+  font-weight: 700;
+  font-size: 2.5rem;
+  /* Tighter, less massive */
 }
 
 /* Layout */
@@ -65,67 +68,71 @@ main {
 /* Header */
 .hero-section {
   text-align: left;
-  padding: 4rem 0 2rem 0;
+  padding: 3rem 0 1.5rem 0;
   margin-bottom: 1rem;
+  border-bottom: 1px solid #E5E7EB;
+  /* Technical divider */
 }
 
 .logo-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .logo-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1;
-  background: linear-gradient(90deg, var(--waymo-blue) 0%, var(--waymo-green) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  /* Gradient text for 2.0 */
+  color: var(--waymo-navy);
+  /* Solid Navy for precision */
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 400;
   max-width: 600px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* Cards - Solid & Clean */
+/* Cards - Technical & Sharp */
 .card,
 .match-card {
   background: var(--card-white);
   border-radius: var(--radius);
-  padding: 3rem;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-  /* Soft, deep shadow */
-  border: none;
-  margin-top: 2rem;
+  padding: 2rem;
+  /* Tighter padding */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  /* Micro shadow */
+  border: 1px solid #E5E7EB;
+  /* Subtle border */
+  margin-top: 1.5rem;
 }
 
 /* Buttons - Waymo Green */
 .primary-button {
   background: var(--waymo-green);
   color: var(--waymo-navy);
-  border: none;
-  padding: 1.2rem 2.5rem;
-  border-radius: var(--pill-radius);
-  font-size: 1.1rem;
-  font-weight: 700;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.8rem 1.5rem;
+  /* Snappier sizing */
+  border-radius: 8px;
+  /* Slightly rounded, not pill */
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(0, 232, 157, 0.3);
+  transition: all 0.1s ease-out;
+  /* Fast transition */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .primary-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 232, 157, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 232, 157, 0.2);
+  filter: brightness(1.02);
 }
 
 .primary-button:active {
@@ -133,10 +140,11 @@ main {
 }
 
 .primary-button:disabled {
-  background: #E5E7EB;
+  background: #F3F4F6;
   color: #9CA3AF;
   box-shadow: none;
   cursor: not-allowed;
+  border-color: transparent;
 }
 
 /* Inputs */
@@ -189,37 +197,89 @@ textarea:focus {
 }
 
 /* Route Line Progress Bar */
+/* Route Line Progress Bar */
 .progress-container {
   width: 100%;
-  height: 8px;
-  /* Thinner line */
+  height: 4px;
+  /* Ultra thin technical line */
   background: #E5E7EB;
-  /* Track color */
-  border-radius: 4px;
+  border-radius: 2px;
   position: relative;
   margin-top: 3rem;
-  /* Space for car */
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--waymo-blue), var(--waymo-green));
-  border-radius: 4px;
+  background: var(--waymo-blue);
+  /* Solid blue for precision */
+  border-radius: 2px;
   transition: width 0.5s linear;
 }
 
 /* Car Driving ON the line */
 .waymo-car {
   position: absolute;
-  top: -14px;
-  /* Centered on the line (30px height / 2 - 8px bar / 2 approx) */
-  width: 60px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  /* Smaller, sharper */
   height: auto;
-  transform: translateX(-50%);
   transition: left 0.5s linear;
   z-index: 10;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Lidar Pulse Animation */
+.lidar-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 86, 245, 0.2);
+  animation: pulse 2s infinite;
+  z-index: -1;
+}
+
+.lidar-pulse::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--waymo-blue);
+  animation: ripple 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    border-width: 1px;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(6);
+    opacity: 0;
+    border-width: 0px;
+  }
 }
 
 /* Match Cards */

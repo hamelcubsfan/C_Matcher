@@ -375,34 +375,37 @@ export default function HomePage() {
                     {loadingMessage}
                   </div>
                   <div className="progress-container">
-                    {/* Waypoints */}
-                    <div style={{ position: 'absolute', left: '0%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: '#E5E7EB', borderRadius: '50%', zIndex: 1 }}></div>
-                    <div style={{ position: 'absolute', left: '25%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 25 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
-                    <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 50 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
-                    <div style={{ position: 'absolute', left: '75%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', background: progress >= 75 ? 'var(--waymo-blue)' : '#E5E7EB', borderRadius: '50%', zIndex: 1, transition: 'background 0.3s' }}></div>
-                    <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '16px', height: '16px', border: '4px solid var(--waymo-green)', background: 'white', borderRadius: '50%', zIndex: 1 }}></div>
+                    {/* Technical Waypoints (Ticks) */}
+                    {[0, 25, 50, 75, 100].map((point) => (
+                      <div
+                        key={point}
+                        style={{
+                          position: 'absolute',
+                          left: `${point}%`,
+                          top: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '8px',
+                          height: '8px',
+                          background: progress >= point ? 'var(--waymo-blue)' : '#E5E7EB',
+                          borderRadius: '50%',
+                          zIndex: 1,
+                          transition: 'all 0.3s',
+                          boxShadow: progress >= point ? '0 0 0 2px white' : 'none'
+                        }}
+                      />
+                    ))}
 
                     <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+
                     <div className="waymo-car" style={{ left: `${progress}%` }}>
-                      <svg width="60" height="30" viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        {/* Jaguar I-PACE Silhouette */}
-                        <path d="M2 20C2 20 5 12 18 12H38C46 12 52 15 56 20V24C56 26.2 54.2 28 52 28H8C5.8 28 4 26.2 4 24L2 20Z" fill="white" stroke="#1d1d1f" strokeWidth="2" />
-
-                        {/* Waymo Sensor Dome */}
-                        <path d="M26 6H34V12H26V6Z" fill="#1d1d1f" />
-                        <circle cx="30" cy="5" r="3" fill="#1d1d1f" />
-                        <circle cx="30" cy="5" r="1.5" fill="#3ddc91" /> {/* Lidar Spin */}
-
-                        {/* Wheels */}
-                        <circle cx="14" cy="28" r="5" fill="#1d1d1f" />
-                        <circle cx="46" cy="28" r="5" fill="#1d1d1f" />
-                        <circle cx="14" cy="28" r="2" fill="#555" />
-                        <circle cx="46" cy="28" r="2" fill="#555" />
-
-                        {/* Windows */}
-                        <path d="M16 14L20 14L22 20H14L16 14Z" fill="#0056f5" fillOpacity="0.2" />
-                        <path d="M24 14H36L38 20H22L24 14Z" fill="#0056f5" fillOpacity="0.2" />
-                        <path d="M38 14H44L42 20H38V14Z" fill="#0056f5" fillOpacity="0.2" />
+                      <div className="lidar-pulse"></div>
+                      {/* Sharp Side Profile I-PACE */}
+                      <svg width="40" height="20" viewBox="0 0 40 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 12C2 12 5 6 14 6H26C32 6 36 8 38 12V15C38 16.1 37.1 17 36 17H4C2.9 17 2 16.1 2 15V12Z" fill="white" stroke="#1D1D1F" strokeWidth="1.5" />
+                        <circle cx="10" cy="17" r="3" fill="#1D1D1F" />
+                        <circle cx="30" cy="17" r="3" fill="#1D1D1F" />
+                        <rect x="18" y="3" width="4" height="3" fill="#1D1D1F" /> {/* Lidar Puck */}
+                        <circle cx="20" cy="3" r="1" fill="#00E89D" /> {/* Active Green Dot */}
                       </svg>
                     </div>
                   </div>
