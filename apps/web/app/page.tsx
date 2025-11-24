@@ -121,19 +121,34 @@ function LoadingMessages() {
 }
 
 // Sensor Ring Component
-function SensorRing({ value, label, size = 60 }: { value: number | null | undefined; label: string; size?: number }) {
+function SensorRing({
+  value,
+  label,
+  size = 60,
+  thresholds = { green: 75, yellow: 40 },
+  tooltip = ""
+}: {
+  value: number | null | undefined;
+  label: string;
+  size?: number;
+  thresholds?: { green: number; yellow: number };
+  tooltip?: string;
+}) {
   const score = value ? Math.round(value * 100) : 0;
   const radius = (size - 8) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (score / 100) * circumference;
 
   let color = '#E5E7EB';
-  if (score >= 75) color = '#00E89D'; // Green
-  else if (score >= 40) color = '#F59E0B'; // Yellow
+  if (score >= thresholds.green) color = '#00E89D'; // Green
+  else if (score >= thresholds.yellow) color = '#F59E0B'; // Yellow
   else if (score > 0) color = '#EF4444'; // Red
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', cursor: 'help' }}
+      title={tooltip}
+    >
       <div style={{ position: 'relative', width: size, height: size }}>
         {/* Background Circle */}
         <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
@@ -592,10 +607,23 @@ export default function HomePage() {
                     </div>
 
                     {/* Sensor Rings Row */}
-                    <div style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', padding: '1rem 0', borderTop: '1px solid #F3F4F6', borderBottom: '1px solid #F3F4F6' }}>
-                      <SensorRing value={match.retrieval_score} label="Retrieval" />
-                      <SensorRing value={match.rerank_score} label="Rerank" />
-                      <SensorRing value={match.confidence} label="Confidence" />
+                    <div style={{ display: 'flex', gap: '2rem', marginBottom: '1.5rem' }}>
+                      <SensorRing
+                        value={match.retrieval_score}
+                        label="Keyword Match"
+                        tooltip="How well the resume keywords matched the job description."
+                      />
+                      <SensorRing
+                        value={match.rerank_score}
+                        label="Semantic Check"
+                        thresholds={{ green: 60, yellow: 20 }}
+                        tooltip="A stricter check for deep meaning alignment. Scores > 20 are good."
+                      />
+                      <SensorRing
+                        value={match.confidence_score}
+                        label="Overall Fit"
+                        tooltip="Gemini's final assessment of the candidate's fit."
+                      />
                     </div>
 
                     {match.explanation && (
