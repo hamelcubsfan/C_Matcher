@@ -391,7 +391,7 @@ export default function HomePage() {
                   <label className="upload-label">
                     <input
                       type="file"
-                      accept=".txt,.pdf,.md"
+                      accept=".txt,.pdf,.md,.docx"
                       onChange={handleFileChange}
                       disabled={uploading}
                     />
@@ -403,7 +403,7 @@ export default function HomePage() {
                       </svg>
                     </div>
                     <span className="upload-text-main">Click to upload resume</span>
-                    <span className="upload-text-sub">PDF, TXT, or Markdown</span>
+                    <span className="upload-text-sub">PDF, DOCX, TXT, or Markdown</span>
                   </label>
                 </div>
 
