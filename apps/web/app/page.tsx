@@ -119,6 +119,80 @@ function LoadingMessages() {
   return <span>{LOADING_MESSAGES[index]}</span>;
 }
 
+// Sensor Ring Component
+function SensorRing({ value, label, size = 60 }: { value: number | null | undefined; label: string; size?: number }) {
+  const score = value ? Math.round(value * 100) : 0;
+  const radius = (size - 8) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (score / 100) * circumference;
+
+  let color = '#E5E7EB';
+  if (score >= 75) color = '#00E89D'; // Green
+  else if (score >= 40) color = '#F59E0B'; // Yellow
+  else if (score > 0) color = '#EF4444'; // Red
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+      <div style={{ position: 'relative', width: size, height: size }}>
+        {/* Background Circle */}
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="#E5E7EB"
+            strokeWidth="4"
+          />
+          {/* Progress Circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="4"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+          />
+        </svg>
+        {/* Score Text */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: '0.9rem',
+          fontWeight: 700,
+          color: 'var(--waymo-navy)'
+        }}>
+          {value !== null && value !== undefined ? score : '—'}
+        </div>
+      </div>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+// Skeleton Card Component
+function SkeletonCard() {
+  return (
+    <div className="match-card" style={{ height: '200px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ width: '60%', height: '24px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 1.5s infinite' }}></div>
+      <div style={{ width: '40%', height: '16px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 1.5s infinite' }}></div>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: 'auto' }}>
+        <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#F3F4F6', animation: 'pulse 1.5s infinite' }}></div>
+        <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#F3F4F6', animation: 'pulse 1.5s infinite' }}></div>
+        <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: '#F3F4F6', animation: 'pulse 1.5s infinite' }}></div>
+      </div>
+    </div>
+  );
+}
+
 import React from 'react';
 
 export default function HomePage() {
@@ -486,72 +560,84 @@ export default function HomePage() {
         </div>
       )}
 
-      {matches.length > 0 && (
+      {(matches.length > 0 || loadingMatches) && (
         <section className="card" style={{ marginTop: '1.75rem' }}>
           <h2>3. Route to the right Waymo roles</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
             Each card blends retrieval scores, reranker feedback, and Gemini explanations so you can take action fast.
           </p>
+
           <div className="match-grid">
-            {matches.map((match) => {
-              const badge = confidenceBadge(match.confidence);
-              return (
-                <article key={match.job.id} className="match-card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
-                    <div>
-                      <h3 style={{ marginBottom: '0.35rem' }}>{match.job.title}</h3>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                        <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>#{match.job.greenhouse_job_id}</span>
-                        {match.job.team ?? 'Team TBD'} {match.job.location ? `• ${match.job.location}` : ''}
+            {loadingMatches ? (
+              <>
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+              </>
+            ) : (
+              matches.map((match) => {
+                const badge = confidenceBadge(match.confidence);
+                return (
+                  <article key={match.job.id} className="match-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                      <div>
+                        <h3 style={{ marginBottom: '0.35rem' }}>{match.job.title}</h3>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                          <span style={{ fontWeight: 600, marginRight: '0.5rem' }}>#{match.job.greenhouse_job_id}</span>
+                          {match.job.team ?? 'Team TBD'} {match.job.location ? `• ${match.job.location}` : ''}
+                        </div>
                       </div>
+                      <span className={badge.className}>{badge.label}</span>
                     </div>
-                    <span className={badge.className}>{badge.label}</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', fontSize: '0.85rem' }}>
-                    <span className="tag">Retrieval {formatScore(match.retrieval_score)}</span>
-                    <span className="tag">Rerank {formatScore(match.rerank_score)}</span>
-                    <span className="tag">Confidence {formatScore(match.confidence)}</span>
-                  </div>
-                  {match.explanation && (
-                    <div className="markdown-content" style={{ color: 'var(--text-muted)', lineHeight: 1.55, marginTop: '1rem' }}>
-                      <ReactMarkdown>{match.explanation}</ReactMarkdown>
+
+                    {/* Sensor Rings Row */}
+                    <div style={{ display: 'flex', gap: '2rem', margin: '1.5rem 0', padding: '1rem 0', borderTop: '1px solid #F3F4F6', borderBottom: '1px solid #F3F4F6' }}>
+                      <SensorRing value={match.retrieval_score} label="Retrieval" />
+                      <SensorRing value={match.rerank_score} label="Rerank" />
+                      <SensorRing value={match.confidence} label="Confidence" />
                     </div>
-                  )}
-                  {match.reason_codes && match.reason_codes.length > 0 && (
-                    <div>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-muted)' }}>
-                        Why it surfaced
+
+                    {match.explanation && (
+                      <div className="markdown-content" style={{ color: 'var(--text-muted)', lineHeight: 1.55 }}>
+                        <ReactMarkdown>{match.explanation}</ReactMarkdown>
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        {match.reason_codes
-                          .map((reason, index) => ({ reason, label: normaliseReason(reason), index }))
-                          .filter((entry) => entry.label)
-                          .map((entry) => (
-                            <span key={entry.index} className="reason-chip">
-                              {entry.label}
-                            </span>
-                          ))}
+                    )}
+                    {match.reason_codes && match.reason_codes.length > 0 && (
+                      <div style={{ marginTop: '1rem' }}>
+                        <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-muted)' }}>
+                          Why it surfaced
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {match.reason_codes
+                            .map((reason, index) => ({ reason, label: normaliseReason(reason), index }))
+                            .filter((entry) => entry.label)
+                            .map((entry) => (
+                              <span key={entry.index} className="reason-chip">
+                                {entry.label}
+                              </span>
+                            ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {match.job.absolute_url && (
-                    <a
-                      href={match.job.absolute_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="arrow-link"
-                      style={{ marginTop: 'auto' }}
-                    >
-                      Open job posting
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </a>
-                  )}
-                </article>
-              );
-            })}
+                    )}
+                    {match.job.absolute_url && (
+                      <a
+                        href={match.job.absolute_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="arrow-link"
+                        style={{ marginTop: '1.5rem' }}
+                      >
+                        Open job posting
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M3.33337 8H12.6667" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M8 3.33331L12.6667 7.99998L8 12.6666" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </a>
+                    )}
+                  </article>
+                );
+              })
+            )}
           </div>
         </section>
       )}

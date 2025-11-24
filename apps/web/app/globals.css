@@ -22,10 +22,17 @@ html {
   background: var(--surface-gray);
 }
 
+/* Map Texture Background */
 body {
   margin: 0;
   font-family: 'Outfit', sans-serif;
-  background: var(--surface-gray);
+  background-color: var(--surface-gray);
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba(0, 86, 245, 0.03) 0%, transparent 25%),
+    linear-gradient(rgba(29, 29, 31, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(29, 29, 31, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  /* Grid Pattern */
   color: var(--waymo-navy);
   padding: 2rem;
   min-height: 100vh;
