@@ -377,27 +377,25 @@ export default function HomePage() {
                   <div className="progress-container">
                     <div className="progress-bar" style={{ width: `${progress}%` }}></div>
                     <div className="waymo-car" style={{ left: `${progress}%` }}>
-                      <svg width="48" height="36" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        {/* Wheels */}
-                        <circle cx="12" cy="28" r="5" fill="#1d1d1f" />
-                        <circle cx="36" cy="28" r="5" fill="#1d1d1f" />
-                        <circle cx="12" cy="28" r="2" fill="#555" />
-                        <circle cx="36" cy="28" r="2" fill="#555" />
+                      <svg width="60" height="30" viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Jaguar I-PACE Silhouette */}
+                        <path d="M2 20C2 20 5 12 18 12H38C46 12 52 15 56 20V24C56 26.2 54.2 28 52 28H8C5.8 28 4 26.2 4 24L2 20Z" fill="white" stroke="#1d1d1f" strokeWidth="2" />
 
-                        {/* Body */}
-                        <path d="M4 20C4 12 10 8 24 8C38 8 44 12 44 20V24C44 26.2 42.2 28 40 28H8C5.8 28 4 26.2 4 24V20Z" fill="white" stroke="#1d1d1f" strokeWidth="2.5" />
+                        {/* Waymo Sensor Dome */}
+                        <path d="M26 6H34V12H26V6Z" fill="#1d1d1f" />
+                        <circle cx="30" cy="5" r="3" fill="#1d1d1f" />
+                        <circle cx="30" cy="5" r="1.5" fill="#3ddc91" /> {/* Lidar Spin */}
+
+                        {/* Wheels */}
+                        <circle cx="14" cy="28" r="5" fill="#1d1d1f" />
+                        <circle cx="46" cy="28" r="5" fill="#1d1d1f" />
+                        <circle cx="14" cy="28" r="2" fill="#555" />
+                        <circle cx="46" cy="28" r="2" fill="#555" />
 
                         {/* Windows */}
-                        <path d="M12 18C12 14 16 12 24 12C32 12 36 14 36 18H12Z" fill="#0056f5" fillOpacity="0.2" />
-
-                        {/* Lidar Dome */}
-                        <path d="M20 6H28V8H20V6Z" fill="#1d1d1f" />
-                        <circle cx="24" cy="5" r="3" fill="#1d1d1f" />
-                        <circle cx="24" cy="5" r="1" fill="#3ddc91" />
-
-                        {/* Headlights/Tailights */}
-                        <circle cx="43" cy="22" r="1.5" fill="#3ddc91" />
-                        <circle cx="5" cy="22" r="1.5" fill="#ff4d4d" />
+                        <path d="M16 14L20 14L22 20H14L16 14Z" fill="#0056f5" fillOpacity="0.2" />
+                        <path d="M24 14H36L38 20H22L24 14Z" fill="#0056f5" fillOpacity="0.2" />
+                        <path d="M38 14H44L42 20H38V14Z" fill="#0056f5" fillOpacity="0.2" />
                       </svg>
                     </div>
                   </div>

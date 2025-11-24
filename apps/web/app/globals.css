@@ -104,7 +104,13 @@ h4,
 h5,
 h6 {
   color: var(--waymo-navy);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  /* Tighter tracking for modern feel */
+  font-weight: 700;
+}
+
+h1 {
+  font-weight: 800;
 }
 
 /* Animations */
@@ -462,9 +468,10 @@ h6 {
 /* Waymo Car Animation */
 .waymo-car {
   position: absolute;
-  top: -28px;
-  /* Sit on top of the bar */
-  width: 40px;
+  top: 14px;
+  /* Hangs below the bar */
+  width: 60px;
+  /* Wider for Jaguar */
   height: auto;
   transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-50%);
