@@ -126,23 +126,28 @@ function SensorRing({
   label,
   size = 60,
   thresholds = { green: 75, yellow: 40 },
+  max = 100,
   tooltip = ""
 }: {
   value: number | null | undefined;
   label: string;
   size?: number;
   thresholds?: { green: number; yellow: number };
+  max?: number;
   tooltip?: string;
 }) {
-  const score = value ? Math.round(value * 100) : 0;
+  const rawScore = value ? Math.round(value * 100) : 0;
+  // Normalize score for visual ring (cap at 100%)
+  const visualPercent = Math.min(100, Math.round((rawScore / max) * 100));
+
   const radius = (size - 8) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (score / 100) * circumference;
+  const offset = circumference - (visualPercent / 100) * circumference;
 
   let color = '#E5E7EB';
-  if (score >= thresholds.green) color = '#00E89D'; // Green
-  else if (score >= thresholds.yellow) color = '#F59E0B'; // Yellow
-  else if (score > 0) color = '#EF4444'; // Red
+  if (rawScore >= thresholds.green) color = '#00E89D'; // Green
+  else if (rawScore >= thresholds.yellow) color = '#F59E0B'; // Yellow
+  else if (rawScore > 0) color = '#EF4444'; // Red
 
   return (
     <div
@@ -184,7 +189,7 @@ function SensorRing({
           fontWeight: 700,
           color: 'var(--waymo-navy)'
         }}>
-          {value !== null && value !== undefined ? score : '—'}
+          {value !== null && value !== undefined ? rawScore : '—'}
         </div>
       </div>
       <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -624,13 +629,15 @@ export default function HomePage() {
                         value={match.retrieval_score}
                         label="Keyword Match"
                         thresholds={{ green: 55, yellow: 35 }}
-                        tooltip="Based on keyword overlap. > 55 is excellent."
+                        max={85}
+                        tooltip="Based on keyword overlap. Normalized for display (0-85 scale)."
                       />
                       <SensorRing
                         value={match.rerank_score}
                         label="Semantic Check"
                         thresholds={{ green: 20, yellow: 10 }}
-                        tooltip="A stricter check for deep meaning alignment. > 20 is excellent."
+                        max={35}
+                        tooltip="A stricter check for deep meaning alignment. Normalized for display (0-35 scale)."
                       />
                       <SensorRing
                         value={match.confidence}
