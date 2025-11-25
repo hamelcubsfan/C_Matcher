@@ -611,14 +611,14 @@ export default function HomePage() {
                       <SensorRing
                         value={match.retrieval_score}
                         label="Keyword Match"
-                        thresholds={{ green: 60, yellow: 40 }}
-                        tooltip="Based on keyword overlap. > 60 is excellent."
+                        thresholds={{ green: 55, yellow: 35 }}
+                        tooltip="Based on keyword overlap. > 55 is excellent."
                       />
                       <SensorRing
                         value={match.rerank_score}
                         label="Semantic Check"
-                        thresholds={{ green: 25, yellow: 10 }}
-                        tooltip="A stricter check for deep meaning alignment. > 25 is excellent."
+                        thresholds={{ green: 20, yellow: 10 }}
+                        tooltip="A stricter check for deep meaning alignment. > 20 is excellent."
                       />
                       <SensorRing
                         value={match.confidence}
@@ -674,3 +674,4 @@ export default function HomePage() {
     </main>
   );
 }
+ 
