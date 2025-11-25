@@ -172,75 +172,97 @@ class MatchService:
             
             import json
             
-            results: list[MatchResult] = []
-            for i, (job, retrieval_score, rerank_score) in enumerate(candidates_to_check):
-                # Calculate progress from 30% to 90%
-                current_progress = 30 + int((i / total_to_check) * 60)
-                yield {"status": f"Analyzing fit for {job.title}...", "progress": current_progress}
-                
-                print(f"DEBUG: Processing Job {job.id} ({job.title}) - Retrieval: {retrieval_score:.4f}", flush=True)
-                
-                # REMOVED EARLY STOPPING to ensure we find the global best matches in the pool
-                # if len(results) >= top_k:
-                #     print(f"DEBUG: Found enough matches ({len(results)}), stopping.", flush=True)
-                #     break
-
-                explanation_json = self.explain(candidate, job)
-                
-                # Parse the JSON explanation to get structured data
+            # Parallelize explanation generation
+            import concurrent.futures
+            
+            # Helper function for parallel execution
+            def process_match(job, retrieval_score, rerank_score):
                 try:
-                    explanation_data = json.loads(explanation_json)
-                    summary = explanation_data.get("summary", "No summary available.")
-                    llm_confidence = explanation_data.get("confidence")
-                    reason_codes = explanation_data.get("reasons", [])
-                except json.JSONDecodeError:
-                    logger.warning("Failed to parse explanation JSON", exc_info=True)
-                    print(f"DEBUG: Failed to parse JSON for Job {job.id}", flush=True)
-                    summary = explanation_json
-                    llm_confidence = None
-                    reason_codes = []
+                    explanation_json = self.explain(candidate, job)
+                    return job, retrieval_score, rerank_score, explanation_json
+                except Exception as e:
+                    logger.error(f"Error processing job {job.id}: {e}", exc_info=True)
+                    return job, retrieval_score, rerank_score, None
 
-                # Filter out low confidence matches based on LLM assessment
-                if llm_confidence is not None:
-                    print(f"DEBUG: Job {job.id} ({job.title}): LLM confidence {llm_confidence}", flush=True)
-                else:
-                    print(f"DEBUG: Job {job.id} ({job.title}): No LLM confidence returned", flush=True)
-
-                # Filter by LLM confidence
-                # User requested strict filtering: only return GOOD matches (> 0.7)
-                if llm_confidence is None or llm_confidence < 0.7:
-                    print(f"DEBUG: Skipping match for job {job.id} due to low/missing LLM confidence: {llm_confidence}", flush=True)
-                    continue
-
-                # Use LLM confidence if available, otherwise fall back to retrieval/rerank average
-                if llm_confidence is not None:
-                    confidence = llm_confidence
-                else:
-                    confidence = (retrieval_score + rerank_score) / 2 if rerank_score is not None else retrieval_score
+            results: list[MatchResult] = []
+            
+            # Use ThreadPoolExecutor with max_workers=8 to respect rate limits
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+                # Submit all tasks
+                future_to_job = {
+                    executor.submit(process_match, job, ret, rer): job 
+                    for job, ret, rer in candidates_to_check
+                }
                 
-                match = (
-                    self.session.query(Match)
-                    .filter(Match.candidate_id == candidate.id, Match.job_id == job.id)
-                    .one_or_none()
-                )
-                if match is None:
-                    match = Match(candidate_id=candidate.id, job_id=job.id)
-                match.retrieval_score = retrieval_score
-                match.rerank_score = rerank_score
-                match.confidence = confidence
-                match.explanation = summary  # Store the clean text summary
-                match.reason_codes = reason_codes
-                self.session.add(match)
-                results.append(
-                    MatchResult(
-                        job=job,
-                        retrieval_score=retrieval_score,
-                        rerank_score=rerank_score,
-                        confidence=confidence,
-                        explanation=summary, # Return the clean text summary
-                        reason_codes=reason_codes,
-                    )
-                )
+                completed_count = 0
+                for future in concurrent.futures.as_completed(future_to_job):
+                    completed_count += 1
+                    # Calculate progress from 30% to 95%
+                    current_progress = 30 + int((completed_count / total_to_check) * 65)
+                    yield {"status": f"Analyzing matches ({completed_count}/{total_to_check})...", "progress": current_progress}
+                    
+                    try:
+                        job, retrieval_score, rerank_score, explanation_json = future.result()
+                        
+                        if not explanation_json:
+                            continue
+
+                        # Parse the JSON explanation to get structured data
+                        try:
+                            explanation_data = json.loads(explanation_json)
+                            summary = explanation_data.get("summary", "No summary available.")
+                            llm_confidence = explanation_data.get("confidence")
+                            reason_codes = explanation_data.get("reasons", [])
+                        except json.JSONDecodeError:
+                            logger.warning("Failed to parse explanation JSON", exc_info=True)
+                            print(f"DEBUG: Failed to parse JSON for Job {job.id}", flush=True)
+                            summary = explanation_json
+                            llm_confidence = None
+                            reason_codes = []
+
+                        # Filter out low confidence matches based on LLM assessment
+                        if llm_confidence is not None:
+                            print(f"DEBUG: Job {job.id} ({job.title}): LLM confidence {llm_confidence}", flush=True)
+                        else:
+                            print(f"DEBUG: Job {job.id} ({job.title}): No LLM confidence returned", flush=True)
+
+                        # Filter by LLM confidence
+                        # User requested strict filtering: only return GOOD matches (> 0.7)
+                        if llm_confidence is None or llm_confidence < 0.7:
+                            print(f"DEBUG: Skipping match for job {job.id} due to low/missing LLM confidence: {llm_confidence}", flush=True)
+                            continue
+
+                        # Use LLM confidence if available, otherwise fall back to retrieval/rerank average
+                        if llm_confidence is not None:
+                            confidence = llm_confidence
+                        else:
+                            confidence = (retrieval_score + rerank_score) / 2 if rerank_score is not None else retrieval_score
+                        
+                        match = (
+                            self.session.query(Match)
+                            .filter(Match.candidate_id == candidate.id, Match.job_id == job.id)
+                            .one_or_none()
+                        )
+                        if match is None:
+                            match = Match(candidate_id=candidate.id, job_id=job.id)
+                        match.retrieval_score = retrieval_score
+                        match.rerank_score = rerank_score
+                        match.confidence = confidence
+                        match.explanation = summary  # Store the clean text summary
+                        match.reason_codes = reason_codes
+                        self.session.add(match)
+                        results.append(
+                            MatchResult(
+                                job=job,
+                                retrieval_score=retrieval_score,
+                                rerank_score=rerank_score,
+                                confidence=confidence,
+                                explanation=summary, # Return the clean text summary
+                                reason_codes=reason_codes,
+                            )
+                        )
+                    except Exception as e:
+                        logger.error(f"Exception in worker thread: {e}", exc_info=True)
             
             # Sort by confidence descending so the best matches are first
             results.sort(key=lambda x: x.confidence or 0, reverse=True)
@@ -249,7 +271,6 @@ class MatchService:
             results = results[:top_k]
             
             logger.info(f"Returning {len(results)} matches")
-            yield {"status": "Finalizing matches...", "progress": 95}
             
             # Final yield with data
             yield {"status": "Complete", "progress": 100, "data": [r.model_dump() for r in results]}
