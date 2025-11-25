@@ -116,8 +116,10 @@ Rules:
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
   - **Practitioner vs. Adjacent Experience Check**:
     - CRITICAL: Distinguish between *doing* the work (verbs: built, coded, designed, implemented, deployed) and *supporting* the work (verbs: hired, sourced, sold, managed project, partnered with).
-    - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate's experience is primarily Adjacent (Recruiter, Sales, PM without technical depth), they are NOT a match.
-    - Do NOT hallucinate that "Recruiting for ML" or "Selling ML" means "Experience in ML".
+    - **Title Ambiguity Trap**: If the Candidate's title contains "Talent", "Recruiting", "Sourcing", or "Staffing" (e.g. "Staff Researcher - Talent", "Engineering Manager - Recruiting"), they are **NOT** a Practitioner.
+      - "Staff Researcher - Talent" == Recruiter.
+      - "Engineering Recruiter" == Recruiter.
+    - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate is a Recruiter/Sourcer (even with "Staff" or "Principal" titles), they are NOT a match.
     - PENALIZE confidence to max 0.1 for this mismatch.
   - **Location Mismatch**:
     - If the Job Location is in a different continent than the Candidate (e.g. US vs Poland) and the job is NOT marked "Remote":

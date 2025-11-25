@@ -611,13 +611,14 @@ export default function HomePage() {
                       <SensorRing
                         value={match.retrieval_score}
                         label="Keyword Match"
-                        tooltip="How well the resume keywords matched the job description."
+                        thresholds={{ green: 60, yellow: 40 }}
+                        tooltip="Based on keyword overlap. > 60 is excellent."
                       />
                       <SensorRing
                         value={match.rerank_score}
                         label="Semantic Check"
-                        thresholds={{ green: 60, yellow: 20 }}
-                        tooltip="A stricter check for deep meaning alignment. Scores > 20 are good."
+                        thresholds={{ green: 25, yellow: 10 }}
+                        tooltip="A stricter check for deep meaning alignment. > 25 is excellent."
                       />
                       <SensorRing
                         value={match.confidence}
@@ -673,4 +674,3 @@ export default function HomePage() {
     </main>
   );
 }
- 
