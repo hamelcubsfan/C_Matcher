@@ -113,10 +113,16 @@ Rules:
   - If Job is "Compiler Engineer" and Candidate lacks LLVM/MLIR/Compiler experience: PENALIZE confidence to max 0.4.
   - If Job is "Hardware/FPGA" and Candidate is purely Software: PENALIZE confidence to max 0.4.
   - If Job is "Frontend/Web" and Candidate is purely Backend/ML: PENALIZE confidence to max 0.4.
-  - **Recruiting/Talent experience is NOT Engineering experience**.
-    - **CRITICAL EXCEPTION**: If Job Title contains "Recruiter", "Talent", "Sourcing", or "Staffing", this IS a relevant role. Do NOT penalize.
-    - Otherwise, if Candidate is a Recruiter and Job is an Engineer/Developer/Scientist: PENALIZE confidence to max 0.2.
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
+  - **Practitioner vs. Adjacent Experience Check**:
+    - CRITICAL: Distinguish between *doing* the work (verbs: built, coded, designed, implemented, deployed) and *supporting* the work (verbs: hired, sourced, sold, managed project, partnered with).
+    - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate's experience is primarily Adjacent (Recruiter, Sales, PM without technical depth), they are NOT a match.
+    - Do NOT hallucinate that "Recruiting for ML" or "Selling ML" means "Experience in ML".
+    - PENALIZE confidence to max 0.1 for this mismatch.
+  - **Location Mismatch**:
+    - If the Job Location is in a different continent than the Candidate (e.g. US vs Poland) and the job is NOT marked "Remote":
+    - PENALIZE confidence by 0.3.
+    - Mention the location gap in "Potential Gaps".
 
 - **Reasons Codes**: You MUST select `code` values ONLY from this list:
   - `domain_expertise`
