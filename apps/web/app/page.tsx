@@ -664,7 +664,7 @@ export default function HomePage() {
                               if (!label) return null;
 
                               // Extract weight (0.0-1.0)
-                              const weight = match.reason_weights?.[index] ?? 0.5;
+                              const weight = (match as any).reason_weights?.[index] ?? 0.5;
                               const percentage = Math.round(weight * 100);
 
                               // Color based on weight
