@@ -38,6 +38,7 @@ type MatchResult = {
   confidence?: number | null;
   explanation?: string | null;
   reason_codes?: Record<string, unknown>[];
+  reason_weights?: number[];
 };
 
 type BannerState = {
