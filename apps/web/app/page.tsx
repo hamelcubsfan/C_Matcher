@@ -652,19 +652,55 @@ export default function HomePage() {
                       </div>
                     )}
                     {match.reason_codes && match.reason_codes.length > 0 && (
-                      <div style={{ marginTop: '1rem' }}>
-                        <div style={{ fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-muted)' }}>
-                          Why it surfaced
+                      <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--waymo-navy)', letterSpacing: '0.02em' }}>
+                          Match Signals
                         </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                           {match.reason_codes
-                            .map((reason, index) => ({ reason, label: normaliseReason(reason), index }))
-                            .filter((entry) => entry.label)
-                            .map((entry) => (
-                              <span key={entry.index} className="reason-chip">
-                                {entry.label}
-                              </span>
-                            ))}
+                            .map((reason, index) => {
+                              const label = normaliseReason(reason);
+                              if (!label) return null;
+
+                              // Extract weight (0.0-1.0)
+                              const weight = match.reason_weights?.[index] ?? 0.5;
+                              const percentage = Math.round(weight * 100);
+
+                              // Color based on weight
+                              let barColor = '#E5E7EB';
+                              if (percentage >= 80) barColor = '#00E89D'; // Waymo Teal
+                              else if (percentage >= 60) barColor = '#3B82F6'; // Blue
+                              else if (percentage >= 40) barColor = '#F59E0B'; // Yellow
+                              else barColor = '#EF4444'; // Red
+
+                              return (
+                                <div key={index} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                      {label}
+                                    </span>
+                                    <span style={{ fontSize: '0.7rem', fontWeight: 700, color: barColor }}>
+                                      {percentage}%
+                                    </span>
+                                  </div>
+                                  <div style={{
+                                    width: '100%',
+                                    height: '6px',
+                                    background: '#F3F4F6',
+                                    borderRadius: '3px',
+                                    overflow: 'hidden'
+                                  }}>
+                                    <div style={{
+                                      width: `${percentage}%`,
+                                      height: '100%',
+                                      background: barColor,
+                                      transition: 'width 0.8s ease-out'
+                                    }}></div>
+                                  </div>
+                                </div>
+                              );
+                            })
+                            .filter(Boolean)}
                         </div>
                       </div>
                     )}

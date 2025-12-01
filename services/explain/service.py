@@ -102,13 +102,18 @@ INSTRUCTIONS:
 
 Rules:
 - Do NOT include span IDs (e.g. (R1), (J1)) in the output text.
-- **CRITICAL**: Check for Seniority/Career Stage Mismatch.
-  - Evaluate seniority based on **YEARS OF EXPERIENCE**, not just titles (especially for "Founding Engineer" or "Lead" at startups).
-  - If Candidate has < 3 years exp and Job is Senior/Staff/Principal: PENALIZE confidence to max 0.5.
-  - If Candidate has > 8 years exp and Job is Junior/Entry: PENALIZE confidence to max 0.5.
+  - **CRITICAL**: Check for Seniority/Career Stage Mismatch.
+  - **Year Counting Rules**:
+    - Count ONLY full-time industry experience (exclude internships, research roles, and teaching unless they are full-time post-graduation roles).
+    - For a candidate who graduated in 2022, they can have at most ~2-3 years of industry experience as of 2025.
+    - For each job in the resume, check the date range. If it says "Intern" or is during undergrad/grad school years, it does NOT count.
+  - **Seniority Penalties**:
+    - If Job title contains "Principal" or "Staff" (e.g. "Principal Software Engineer", "Staff ML Engineer") AND Candidate has < 5 years of full-time industry experience: PENALIZE confidence to max 0.2.
+    - If Job title contains "Senior" (but not "Staff" or "Principal") AND Candidate has < 3 years of full-time industry experience: PENALIZE confidence to max 0.4.
+    - If Candidate has > 8 years exp and Job is Junior/Entry: PENALIZE confidence to max 0.5.
   - **Overqualification Check**: If Candidate has > 15 years experience (or Director/VP titles) and Job is a mid-level IC role (e.g. just "Software Engineer" or "Machine Learning Engineer" without Senior/Staff/Principal prefix): PENALIZE confidence to max 0.6.
   - **PhD + Leadership**: If Candidate has a PhD and 3+ years of leadership/mentorship, they are likely qualified for "Tech Lead" or "Manager" roles. Do NOT penalize for lack of formal "Manager" title if they have this.
-  - Explicitly mention this mismatch in the summary.
+  - Explicitly mention this mismatch in "Potential Gaps" if seniority is off.
 - **CRITICAL**: Check for Technical Domain Mismatch.
   - If Job is "Compiler Engineer" and Candidate lacks LLVM/MLIR/Compiler experience: PENALIZE confidence to max 0.4.
   - If Job is "Hardware/FPGA" and Candidate is purely Software: PENALIZE confidence to max 0.4.
