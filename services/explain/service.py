@@ -64,7 +64,7 @@ class ExplanationService:
         must_haves: list[str],
         job_title: str,
     ) -> str:
-        sys_prompt = "You are a Principal Technical Recruiter pitching a candidate to a skeptical Hiring Manager. You hate fluff. You only care about concrete evidence."
+        sys_prompt = "You are a Principal Technical Recruiter writing a factual briefing for a Hiring Manager. Focus on evidence-based assessment, not persuasion."
         prompt = f"""
 Job Title: {job_title}
 
@@ -85,9 +85,10 @@ INSTRUCTIONS:
    - The `summary` field MUST be a Markdown string containing EXACTLY these three sections, in this order:
    
    **Hiring Pitch**
-   [2-3 sentences. Connect specific resume details to job requirements (both explicit and inferred). **BAN FLUFF**. Do not say "aligns with mission". Use concrete nouns.
-    - BAD: "He has 10 years of experience in ADAS."
-    - GOOD: "His experience commercializing GM Super Cruise (L2) directly addresses the safety-critical validation needs of the Waymo Driver, even though 'validation' wasn't explicitly listed. His Boss Kettering Award proves he can ship production code."]
+   [2-3 sentences. FACTUAL TONE ONLY. State what the candidate has done and how it relates to the role. NO sales language ("strong contender", "solidify", "brings to bear"). Avoid robotic phrases ("advanced technical capabilities").
+    - BAD: "The Candidate is a strong contender for this role and brings 10 years of ADAS experience that solidifies their technical capabilities."
+    - GOOD: "The Candidate has 7 years leading ML product development for autonomous vehicles at Motional, including deep learning for 3D object detection. This experience directly applies to the visual reasoning challenges in this role. They hold a PhD in Applied Physics from Caltech."
+   ]
 
    **Why it's a match**
    - [Bullet 1: **Evidence-based mapping**. If you infer a requirement (e.g. "Waymo Planners need MPC"), EXPLAIN THE INFERENCE. e.g., "Waymo Planning requires robust MPC; his PhD thesis on 'Belief-space Guided Navigation' proves deep optimization expertise."]
