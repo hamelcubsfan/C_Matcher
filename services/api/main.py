@@ -29,8 +29,6 @@ from services.shared.storage import load_text_from_pdf, save_upload
 
 app = FastAPI(title="Waymo Role Matcher API")
 settings = get_settings()
-print(f"DATABASE_URL: {settings.database_url}", file=sys.stderr)
-sys.stderr.flush()
 STATIC_WEB_DIR = (
     Path(settings.web_static_dir).resolve() if settings.web_static_dir else None
 )
@@ -48,7 +46,6 @@ import asyncio
 
 @app.on_event("startup")
 async def start_background_ingest():
-    print("DEBUG: services/api/main.py startup", file=sys.stderr)
     # We moved DB init to api/main.py to avoid stale code issues
     
     # Clear candidates on startup for privacy/hygiene
@@ -57,7 +54,6 @@ async def start_background_ingest():
         with get_session_factory()() as session:
             session.query(Candidate).delete()
             session.commit()
-            print("Cleared all candidates.", file=sys.stderr)
     except Exception as e:
         print(f"WARNING: Could not clear candidates: {e}", file=sys.stderr)
 
