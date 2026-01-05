@@ -64,5 +64,14 @@ def get_settings() -> Settings:
         print("WARNING: DATABASE_URL not found in environment. Available keys:", list(os.environ.keys()), file=sys.stderr)
         settings.database_url = "postgresql+psycopg://postgres:postgres@localhost:5432/roles"
 
-    os.makedirs(settings.upload_root, exist_ok=True)
+    try:
+        os.makedirs(settings.upload_root, exist_ok=True)
+    except OSError as e:
+        # Check for Read-only file system (errno 30)
+        if e.errno == 30:
+            print(f"Warning: {settings.upload_root} is read-only. Falling back to /tmp", file=sys.stderr)
+            settings.upload_root = "/tmp"
+            os.makedirs(settings.upload_root, exist_ok=True)
+        else:
+            raise
     return settings

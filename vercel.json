@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "env": {
+    "UPLOAD_ROOT": "/tmp"
+  },
   "builds": [
     {
       "src": "apps/web/package.json",
