@@ -19,7 +19,32 @@ from services.match.service import match_candidate
 from services.shared.config import get_settings
 from services.shared.db import get_session_factory, reset_db, get_engine, Base
 
-# ...
+from services.shared.embeddings import embed_texts
+from services.shared.models import Candidate, Job
+from services.shared.resume import extract_skills, summarize_text, extract_candidate_info
+import docx
+
+from services.shared.schemas import CandidateRead
+from services.shared.storage import load_text_from_pdf, save_upload
+
+app = FastAPI(title="Waymo Role Matcher API")
+settings = get_settings()
+print(f"DATABASE_URL: {settings.database_url}", file=sys.stderr)
+sys.stderr.flush()
+STATIC_WEB_DIR = (
+    Path(settings.web_static_dir).resolve() if settings.web_static_dir else None
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+import asyncio
 
 @app.on_event("startup")
 async def start_background_ingest():
