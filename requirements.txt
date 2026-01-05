@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+psycopg[binary]
+pydantic>=2.0
+python-multipart
+requests
+google-genai>=0.3.0
+pgvector>=0.2.3
+pypdf
+python-docx

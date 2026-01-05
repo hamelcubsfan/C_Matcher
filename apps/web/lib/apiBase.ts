@@ -10,7 +10,7 @@ export const API_BASE = (() => {
     return explicit;
   }
   if (process.env.NODE_ENV === 'production') {
-    return '';
+    return '/api';
   }
   return 'http://localhost:8000';
 })();
