@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 sqlalchemy>=2.0
-psycopg[binary]
+psycopg2-binary
 pydantic>=2.0
 python-multipart
 requests

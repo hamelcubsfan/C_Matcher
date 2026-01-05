@@ -41,9 +41,9 @@ def get_settings() -> Settings:
     if "DATABASE_URL" in os.environ:
         db_url = os.environ["DATABASE_URL"]
         if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql+psycopg://", 1)
+            db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
         elif db_url.startswith("postgresql://"):
-            db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+            db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
         settings.database_url = db_url
         print(f"DATABASE_URL set from environment: {settings.database_url}", file=sys.stderr)
     elif "PGHOST" in os.environ:
@@ -58,11 +58,11 @@ def get_settings() -> Settings:
             auth = f"{user}:{password}"
         else:
             auth = user
-        settings.database_url = f"postgresql+psycopg://{auth}@{host}:{port}/{dbname}"
+        settings.database_url = f"postgresql+psycopg2://{auth}@{host}:{port}/{dbname}"
     else:
         # Default for local development
         print("WARNING: DATABASE_URL not found in environment. Available keys:", list(os.environ.keys()), file=sys.stderr)
-        settings.database_url = "postgresql+psycopg://postgres:postgres@localhost:5432/roles"
+        settings.database_url = "postgresql+psycopg2://postgres:postgres@localhost:5432/roles"
 
     try:
         os.makedirs(settings.upload_root, exist_ok=True)
