@@ -21,7 +21,12 @@ def _init_engine():
     global _engine, _SessionLocal
     if _engine is None:
         settings = get_settings()
-        _engine = create_engine(settings.database_url, echo=False, future=True)
+        _engine = create_engine(
+            settings.database_url,
+            echo=False,
+            future=True,
+            connect_args={"sslmode": "require"},
+        )
         _SessionLocal = sessionmaker(bind=_engine, class_=Session, expire_on_commit=False)
 
 
