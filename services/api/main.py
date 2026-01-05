@@ -48,22 +48,18 @@ import asyncio
 
 @app.on_event("startup")
 async def start_background_ingest():
-    print("DEBUG: Starting database initialization...", file=sys.stderr)
-    # Ensure database tables exist before we try to use them
-    print(f"DEBUG: Tables to create: {list(Base.metadata.tables.keys())}", file=sys.stderr)
-    try:
-        Base.metadata.create_all(bind=get_engine())
-        print("DEBUG: Base.metadata.create_all() completed successfully.", file=sys.stderr)
-    except Exception as e:
-        print(f"DEBUG: Base.metadata.create_all() FAILED: {e}", file=sys.stderr)
-        raise e
-
+    print("DEBUG: services/api/main.py startup", file=sys.stderr)
+    # We moved DB init to api/main.py to avoid stale code issues
+    
     # Clear candidates on startup for privacy/hygiene
-    print("DEBUG: Clearing candidates...", file=sys.stderr)
-    with get_session_factory()() as session:
-        session.query(Candidate).delete()
-        session.commit()
-        print("Cleared all candidates from database on startup.", file=sys.stderr)
+    # Wrap in try/except to prevent crash if tables don't exist yet (though they should)
+    try:
+        with get_session_factory()() as session:
+            session.query(Candidate).delete()
+            session.commit()
+            print("Cleared all candidates.", file=sys.stderr)
+    except Exception as e:
+        print(f"WARNING: Could not clear candidates: {e}", file=sys.stderr)
 
     asyncio.create_task(background_ingest_loop())
 
