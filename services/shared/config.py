@@ -25,7 +25,7 @@ class Settings:
 
     database_url: str = ""  # This will be set by get_settings()
 
-    upload_root: str = os.getenv("UPLOAD_ROOT", "uploads")
+    upload_root: str = os.getenv("UPLOAD_ROOT", "/tmp" if os.getenv("VERCEL") else "uploads")
 
     app_shared_secret: str | None = os.getenv("APP_SHARED_SECRET")
     web_static_dir: str | None = os.getenv("WEB_STATIC_DIR", "apps/web/out")
