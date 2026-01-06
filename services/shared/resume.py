@@ -64,7 +64,7 @@ def extract_candidate_info(text: str) -> CandidateInfo:
             )
             return response.parsed
         except ServerError:
-            logger.warning("Gemini 2.5-flash-lite overloaded, falling back to 2.5-flash for candidate info")
+            logger.warning("Gemini 3 Flash primary call failed, retrying...")
             response = _client.models.generate_content(
                 model="gemini-3-flash-preview",
                 contents=prompt,
@@ -112,7 +112,7 @@ def extract_skills(text: str) -> list[str]:
                 ),
             )
         except ServerError:
-            logger.warning("Gemini 2.5-flash overloaded, falling back to 2.5-flash-lite for skills")
+            logger.warning("Gemini 3 Flash primary call failed, retrying...")
             response = _client.models.generate_content(
                 model="gemini-3-flash-preview",
                 contents=[prompt, text],

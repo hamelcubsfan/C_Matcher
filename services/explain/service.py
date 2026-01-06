@@ -182,7 +182,7 @@ Rules:
             except ServerError:
                 import logging
                 logger = logging.getLogger(__name__)
-                logger.warning("Gemini 2.5-flash-lite overloaded, falling back to 2.5-flash for explanation")
+                logger.warning("Gemini 3 Flash primary call failed, retrying...")
                 response = self.client.models.generate_content(
                     model="gemini-3-flash-preview",
                     contents=[sys_prompt, prompt],
