@@ -173,10 +173,17 @@ class SearchQueries(BaseModel):
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1, min=2, max=10),
 )
-def generate_search_queries(text: str) -> list[str]:
+def generate_search_queries(text: str, skills: list[str] | None = None) -> list[str]:
     """Generate diverse search queries to maximize job retrieval coverage."""
-    prompt = """
+    skills_context = ""
+    if skills:
+        # Take top 10 skills to avoid context window bloat
+        top_skills = ", ".join(skills[:10])
+        skills_context = f"\n    EXTRACTED SKILLS: {top_skills}\n    (Use these skills to ground your queries)"
+
+    prompt = f"""
     Analyze this resume and generate 5 distinct search queries to find the best job matches.
+    {skills_context}
     
     Strategy:
     1.  **Role-based**: "Senior Backend Engineer", "Staff Data Scientist"

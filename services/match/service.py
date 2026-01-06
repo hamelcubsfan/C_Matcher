@@ -101,7 +101,8 @@ class MatchService:
             yield {"status": "Generating search queries...", "progress": 5}
             from services.shared.resume import generate_search_queries
             candidate_text = candidate.parsed_profile.get("raw_text", "")
-            queries = generate_search_queries(candidate_text)
+            candidate_skills = candidate.skills or []
+            queries = generate_search_queries(candidate_text, candidate_skills)
             
             # 2. Embed all queries
             yield {"status": "Embedding search queries...", "progress": 10}
