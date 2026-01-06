@@ -91,6 +91,10 @@ def extract_skills(text: str) -> list[str]:
         "Return only the skills as a list of strings. "
         "Do not include addresses, dates, or company names. "
         "Normalize skills to title case (e.g., 'Python', 'Project Management')."
+        "\n\nCRITICAL - CONTEXT AWARENESS:"
+        "\n- Distinguish between **Practitioner Skills** (doing the work) and **Domain Exposure** (hiring, selling, or managing)."
+        "\n- If a candidate says 'Recruiting for AI' or 'Selling Cloud Solutions', do NOT list 'AI' or 'Cloud' as their skills."
+        "\n- Only list technical skills if the candidate demonstrates **hands-on application** (e.g., 'Built', 'Developed', 'Implemented', 'Coded')."
     )
     
     try:
