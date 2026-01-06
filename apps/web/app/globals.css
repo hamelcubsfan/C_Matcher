@@ -458,3 +458,35 @@ textarea:focus {
 .arrow-link:hover {
   text-decoration: underline;
 }
+
+/* Skeleton Loading */
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.skeleton {
+  background: #27272A;
+  /* Dark mode base */
+  border-radius: 4px;
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: 4px;
+}
+
+.skeleton-block {
+  border-radius: 8px;
+  border: 1px solid #3F3F46;
+}

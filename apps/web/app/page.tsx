@@ -206,22 +206,22 @@ function SkeletonCard() {
     <div className="match-card" style={{ height: 'auto', minHeight: '280px', display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2rem' }}>
       {/* Header Block */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        <div style={{ width: '70%', height: '32px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 2s infinite ease-in-out' }}></div>
-        <div style={{ width: '40%', height: '16px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 2s infinite ease-in-out', animationDelay: '0.2s' }}></div>
+        <div className="skeleton" style={{ width: '70%', height: '32px' }}></div>
+        <div className="skeleton" style={{ width: '40%', height: '16px', animationDelay: '0.2s' }}></div>
       </div>
 
       {/* Score Placeholder (Abstract Bar) */}
       <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-        <div style={{ flex: 1, height: '60px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #F3F4F6' }}></div>
-        <div style={{ flex: 1, height: '60px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #F3F4F6' }}></div>
-        <div style={{ flex: 1, height: '60px', background: '#F9FAFB', borderRadius: '8px', border: '1px solid #F3F4F6' }}></div>
+        <div className="skeleton skeleton-block" style={{ flex: 1, height: '60px' }}></div>
+        <div className="skeleton skeleton-block" style={{ flex: 1, height: '60px', animationDelay: '0.1s' }}></div>
+        <div className="skeleton skeleton-block" style={{ flex: 1, height: '60px', animationDelay: '0.2s' }}></div>
       </div>
 
       {/* Text Lines */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-        <div style={{ width: '100%', height: '14px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 2s infinite ease-in-out', animationDelay: '0.4s' }}></div>
-        <div style={{ width: '95%', height: '14px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 2s infinite ease-in-out', animationDelay: '0.5s' }}></div>
-        <div style={{ width: '90%', height: '14px', background: '#F3F4F6', borderRadius: '4px', animation: 'pulse 2s infinite ease-in-out', animationDelay: '0.6s' }}></div>
+        <div className="skeleton skeleton-text" style={{ width: '100%', animationDelay: '0.4s' }}></div>
+        <div className="skeleton skeleton-text" style={{ width: '95%', animationDelay: '0.5s' }}></div>
+        <div className="skeleton skeleton-text" style={{ width: '90%', animationDelay: '0.6s' }}></div>
       </div>
     </div>
   );
