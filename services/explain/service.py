@@ -172,7 +172,7 @@ Rules:
         try:
             try:
                 response = self.client.models.generate_content(
-                    model="gemini-2.5-flash-lite",
+                    model="gemini-3-flash-preview",
                     contents=[sys_prompt, prompt],
                     config=genai_types.GenerateContentConfig(
                         response_mime_type="application/json",
@@ -184,7 +184,7 @@ Rules:
                 logger = logging.getLogger(__name__)
                 logger.warning("Gemini 2.5-flash-lite overloaded, falling back to 2.5-flash for explanation")
                 response = self.client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-3-flash-preview",
                     contents=[sys_prompt, prompt],
                     config=genai_types.GenerateContentConfig(
                         response_mime_type="application/json",

@@ -55,7 +55,7 @@ def extract_candidate_info(text: str) -> CandidateInfo:
     try:
         try:
             response = _client.models.generate_content(
-                model="gemini-2.5-flash-lite",
+                model="gemini-3-flash-preview",
                 contents=prompt,
                 config={
                     "response_mime_type": "application/json",
@@ -66,7 +66,7 @@ def extract_candidate_info(text: str) -> CandidateInfo:
         except ServerError:
             logger.warning("Gemini 2.5-flash-lite overloaded, falling back to 2.5-flash for candidate info")
             response = _client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-3-flash-preview",
                 contents=prompt,
                 config={
                     "response_mime_type": "application/json",
@@ -99,7 +99,7 @@ def extract_skills(text: str) -> list[str]:
     
     try:
         # Use the stronger model for skills to ensure we capture everything
-        model_name = "gemini-2.5-flash"
+        model_name = "gemini-3-flash-preview"
         logger.info(f"Extracting skills with model: {model_name}")
         
         try:
@@ -114,7 +114,7 @@ def extract_skills(text: str) -> list[str]:
         except ServerError:
             logger.warning("Gemini 2.5-flash overloaded, falling back to 2.5-flash-lite for skills")
             response = _client.models.generate_content(
-                model="gemini-2.5-flash-lite",
+                model="gemini-3-flash-preview",
                 contents=[prompt, text],
                 config=genai.types.GenerateContentConfig(
                     response_mime_type="application/json",
@@ -201,7 +201,7 @@ def generate_search_queries(text: str, skills: list[str] | None = None) -> list[
     
     try:
         response = _client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3-flash-preview",
             contents=[prompt, text],
             config=genai.types.GenerateContentConfig(
                 response_mime_type="application/json",

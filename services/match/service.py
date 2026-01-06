@@ -106,7 +106,7 @@ class MatchService:
             
             # 2. Embed all queries
             yield {"status": "Embedding search queries...", "progress": 10}
-            query_embeddings = embed_texts(queries)
+            query_embeddings = embed_texts(queries, task_type="RETRIEVAL_QUERY")
             
             # 3. Multi-Vector Retrieval
             yield {"status": "Retrieving jobs from vector database...", "progress": 15}
