@@ -132,6 +132,24 @@ Rules:
     - PENALIZE confidence by 0.3.
     - Mention the location gap in "Potential Gaps".
 
+  - **CRITICAL: Role Family Mismatch (The "Recruiter Trap")**:
+    - **Recruiter vs. Engineer**: If the Candidate is a Recruiter/Sourcer/Talent Partner (even "Technical Recruiter") and the Job is an Engineering/Science/Product role (e.g. "Software Engineer", "Data Scientist", "Product Manager"):
+      - **IMMEDIATE REJECTION**: Set confidence to **0.05**.
+      - Explain: "Candidate is a Recruiter, not a Practitioner."
+    - **Talent Sourcing vs. Supply Chain Sourcing**:
+      - If Candidate is "Sourcing Recruiter" or "Talent Sourcer" and Job is "Strategic Sourcing", "Supply Chain", "Procurement", "Commodity Manager":
+      - **IMMEDIATE REJECTION**: Set confidence to **0.05**.
+      - Explain: "Role is Supply Chain Sourcing; Candidate is Talent Sourcing."
+    - **Operations vs. Recruiting Ops**:
+      - If Job is "Quality Operations", "Fleet Operations" (Industrial/Physical) and Candidate is "Recruiting Operations" or "People Ops":
+      - **IMMEDIATE REJECTION**: Set confidence to **0.1**.
+
+  - **Homonym Trap**:
+    - "Architect" (Building) vs "Architect" (Software).
+    - "Driver" (Vehicle Operator) vs "Driver" (Kernel Software).
+    - "Scout" (Sports/Military) vs "Scout" (Recruiting).
+    - If the word matches but the domain is wrong -> **0.1 Confidence**.
+
 - **Reasons Codes**: You MUST select `code` values ONLY from this list:
   - `domain_expertise`
   - `technical_skills`

@@ -180,6 +180,11 @@ def generate_search_queries(text: str) -> list[str]:
     3.  **Domain-based**: "Autonomous Driving Perception", "AdTech Optimization"
     4.  **Seniority-based**: "Principal Engineer", "Engineering Manager"
     
+    CRITICAL DISAMBIGUATION RULES:
+    - **"Sourcing"**: If the candidate is in HR/Recruiting, generate "Talent Sourcing", "Technical Sourcer", "Recruiting". Do NOT generate "Strategic Sourcing" or "Supply Chain" unless they have procurement experience.
+    - **"Recruiter"**: If the candidate is a Recruiter, do NOT generate "Software Engineer" or "Data Scientist" queries, even if they hire for those roles. Generate "Technical Recruiter", "Talent Acquisition Partner".
+    - **"Program Manager"**: Distinguish between "Technical Program Manager" (Engineering) and "Program Manager" (Operations/Non-tech).
+    
     Return a JSON list of strings.
     """
     
