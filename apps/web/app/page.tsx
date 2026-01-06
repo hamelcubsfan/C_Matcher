@@ -66,25 +66,20 @@ const confidenceBadge = (value?: number | null) => {
   return { label: 'Emerging fit', className: 'badge confidence-low' };
 };
 
-const normaliseReason = (reason: Record<string, unknown>) => {
+const normaliseReason = (reason: Record<string, unknown>): string => {
   if (!reason) return '';
   const maybeLabel = typeof reason.label === 'string' ? reason.label : undefined;
   const maybeCode = typeof reason.code === 'string' ? reason.code : undefined;
   const label = maybeLabel ?? maybeCode?.replace(/_/g, ' ').toLowerCase();
-  const score = typeof reason.score === 'number' ? Math.round(reason.score * 100) : undefined;
-  const weight = typeof reason.weight === 'number' ? Math.round(reason.weight * 100) : undefined;
-  const suffix = score !== undefined ? `${score}%` : weight !== undefined ? `${weight}%` : undefined;
-  if (label && suffix) {
-    return `${label} · ${suffix}`;
-  }
   if (label) {
     return label;
   }
+  // Fallback: extract first string key as label
   const entries = Object.entries(reason)
-    .filter(([, value]) => typeof value === 'string' || typeof value === 'number')
-    .slice(0, 2)
-    .map(([key, value]) => `${key}: ${value}`);
-  return entries.join(' · ');
+    .filter(([key, value]) => typeof value === 'string' && key !== 'code')
+    .slice(0, 1)
+    .map(([, value]) => String(value));
+  return entries[0] ?? '';
 };
 
 const toDisplayDate = (value: string | null) => {
