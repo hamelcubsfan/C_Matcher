@@ -112,9 +112,19 @@ Rules:
     - If Job title contains "Principal" or "Staff" (e.g. "Principal Software Engineer", "Staff ML Engineer") AND Candidate has < 5 years of full-time industry experience: PENALIZE confidence to max 0.2.
     - If Job title contains "Senior" (but not "Staff" or "Principal") AND Candidate has < 3 years of full-time industry experience: PENALIZE confidence to max 0.4.
     - If Candidate has > 8 years exp and Job is Junior/Entry: PENALIZE confidence to max 0.5.
-  - **Overqualification Check**: If Candidate has > 15 years experience (or Director/VP titles) and Job is a mid-level IC role (e.g. just "Software Engineer" or "Machine Learning Engineer" without Senior/Staff/Principal prefix): PENALIZE confidence to max 0.6.
+  - **CRITICAL: Over-Qualification Penalty**:
+    - **Level Mapping** (use this for Waymo roles):
+      - Job requires "5-7 years" or "7+ years" without "Staff"/"Principal"/"Director" → L4/L5 (Senior SWE)
+      - Job requires "8-12 years" or has "Staff" in title → L5/L6 (Staff)
+      - Job has "Principal" or "Distinguished" in title → L6+ (Principal/Distinguished)
+      - Job has "Director" or "Head of" in title → Leadership track (not IC)
+    - **Over-Qualification Rules**:
+      - If Candidate has 20+ years of experience OR previous Director/VP/C-level titles AND Job is L4/L5 (just "Senior SWE", "7+ years req"): **PENALIZE confidence to max 0.3**.
+      - Explain: "Candidate is significantly over-qualified (L6+ profile for an L4/L5 role)."
+      - If Candidate has 15+ years experience AND Job is L4/L5: **PENALIZE confidence to max 0.4**.
+      - If Candidate has "Staff" or "Principal" in current title AND Job is standard "Senior" without Staff/Principal prefix: **PENALIZE confidence to max 0.5**.
   - **PhD + Leadership**: If Candidate has a PhD and 3+ years of leadership/mentorship, they are likely qualified for "Tech Lead" or "Manager" roles. Do NOT penalize for lack of formal "Manager" title if they have this.
-  - Explicitly mention this mismatch in "Potential Gaps" if seniority is off.
+  - Explicitly mention seniority mismatch in "Potential Gaps".
 - **CRITICAL**: Check for Technical Domain Mismatch.
   - If Job is "Compiler Engineer" and Candidate lacks LLVM/MLIR/Compiler experience: PENALIZE confidence to max 0.4.
   - If Job is "Hardware/FPGA" and Candidate is purely Software: PENALIZE confidence to max 0.4.
@@ -128,9 +138,13 @@ Rules:
     - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate is a Recruiter/Sourcer (even with "Staff" or "Principal" titles), they are NOT a match.
     - PENALIZE confidence to max 0.1 for this mismatch.
   - **Location Mismatch**:
-    - If the Job Location is in a different continent than the Candidate (e.g. US vs Poland) and the job is NOT marked "Remote":
-    - PENALIZE confidence by 0.3.
-    - Mention the location gap in "Potential Gaps".
+    - **Continental Mismatch**: If the Job Location is in a different continent than the Candidate (e.g. US vs Europe, US vs Asia) and the job is NOT marked "Remote":
+      - PENALIZE confidence by 0.4.
+      - Mention: "Requires international relocation."
+    - **Cross-Country Mismatch (US)**: If both are in the US but different regions (e.g., East Coast → West Coast: Massachusetts/New York → California/Washington):
+      - PENALIZE confidence by 0.15.
+      - Mention: "Requires cross-country relocation."
+    - Mention all location gaps in "Potential Gaps".
 
   - **CRITICAL: Role Family Mismatch (The "Recruiter Trap")**:
     - **Recruiter vs. Engineer**: If the Candidate is a Recruiter/Sourcer/Talent Partner (even "Technical Recruiter") and the Job is an Engineering/Science/Product role (e.g. "Software Engineer", "Data Scientist", "Product Manager"):
