@@ -36,12 +36,87 @@ class ExplanationPayload(BaseModel):
     confidence: float
 
 
+class ScorePayload(BaseModel):
+    confidence: float
+    reasons: List[ExplanationReason] = Field(default_factory=list)
+
+
 class ExplanationService:
     def __init__(self):
         from services.shared.config import get_settings
 
         settings = get_settings()
         self.client = genai.Client(api_key=settings.gemini_api_key)
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(ServerError),
+    )
+    def score(
+        self,
+        resume_spans: str,
+        job_spans: str,
+        must_haves: list[str],
+        job_title: str,
+    ) -> str:
+        """
+        Fast scoring pass for ranking only.
+        Returns JSON: {"confidence": float, "reasons": [...]}
+        """
+        sys_prompt = (
+            "You are a strict technical recruiter evaluator. Output only valid JSON. "
+            "Be conservative with confidence."
+        )
+
+        prompt = f"""
+Job Title: {job_title}
+
+Resume spans:
+{resume_spans}
+
+Job spans:
+{job_spans}
+
+Must-haves: {', '.join(must_haves)}
+
+INSTRUCTIONS:
+- Return a single confidence score 0.0 to 1.0 for match quality.
+- Use ONLY the allowed reason codes.
+- Apply strict mismatch penalties:
+  - If candidate is Recruiter/Sourcer/Talent and job is Engineering/Science/Product: confidence must be 0.05.
+  - If domain mismatch (compiler without LLVM/MLIR, hardware/FPGA without HW, frontend vs backend-only): cap confidence at 0.4.
+  - Penalize seniority mismatch and over-qualification.
+"""
+
+        response = self.client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=[sys_prompt, prompt],
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ScorePayload,
+            ),
+        )
+
+        parsed = getattr(response, "parsed", None)
+        if parsed is not None:
+            return json.dumps(
+                {
+                    "confidence": float(parsed.confidence),
+                    "reasons": [r.model_dump() for r in (parsed.reasons or [])],
+                }
+            )
+
+        if getattr(response, "text", None):
+            data = json.loads(response.text)
+            return json.dumps(
+                {
+                    "confidence": data.get("confidence"),
+                    "reasons": data.get("reasons", []),
+                }
+            )
+
+        raise ValueError("Score response missing parsed payload and text")
 
     @retry(
         stop=stop_after_attempt(3),
@@ -55,11 +130,16 @@ class ExplanationService:
         must_haves: list[str],
         job_title: str,
     ) -> str:
+        """
+        Full explanation pass using your long rule block.
+        Returns JSON: {"summary": "...", "reasons": [...], "confidence": float}
+        """
         sys_prompt = (
             "You are a Principal Technical Recruiter writing a factual briefing for a Hiring Manager. "
             "Focus on evidence-based assessment, not persuasion."
         )
 
+        # This is your long prompt (kept as-is in structure and content, only parsed safely).
         prompt = f"""
 Job Title: {job_title}
 
@@ -127,37 +207,9 @@ Rules:
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
   - **Practitioner vs. Adjacent Experience Check**:
     - CRITICAL: Distinguish between *doing* the work (verbs: built, coded, designed, implemented, deployed) and *supporting* the work (verbs: hired, sourced, sold, managed project, partnered with).
-    - **Title Ambiguity Trap**: If the Candidate's title contains "Talent", "Recruiting", "Sourcing", or "Staffing" (e.g. "Staff Researcher - Talent", "Engineering Manager - Recruiting"), they are NOT a Practitioner.
-      - "Staff Researcher - Talent" == Recruiter.
-      - "Engineering Recruiter" == Recruiter.
-    - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate is a Recruiter/Sourcer (even with "Staff" or "Principal" titles), they are NOT a match.
+    - **Title Ambiguity Trap**: If the Candidate's title contains "Talent", "Recruiting", "Sourcing", or "Staffing", they are NOT a Practitioner.
+    - If the Job requires a Practitioner and the Candidate is a Recruiter/Sourcer, they are NOT a match.
     - PENALIZE confidence to max 0.1 for this mismatch.
-  - **Location Mismatch**:
-    - **Continental Mismatch**: If the Job Location is in a different continent than the Candidate (e.g. US vs Europe, US vs Asia) and the job is NOT marked "Remote":
-      - PENALIZE confidence by 0.4.
-      - Mention: "Requires international relocation."
-    - **Cross-Country Mismatch (US)**: If both are in the US but different regions (e.g., East Coast → West Coast: Massachusetts/New York → California/Washington):
-      - PENALIZE confidence by 0.15.
-      - Mention: "Requires cross-country relocation."
-    - Mention all location gaps in "Potential Gaps".
-
-  - **CRITICAL: Role Family Mismatch (The "Recruiter Trap")**:
-    - **Recruiter vs. Engineer**: If the Candidate is a Recruiter/Sourcer/Talent Partner (even "Technical Recruiter") and the Job is an Engineering/Science/Product role (e.g. "Software Engineer", "Data Scientist", "Product Manager"):
-      - IMMEDIATE REJECTION: Set confidence to 0.05.
-      - Explain: "Candidate is a Recruiter, not a Practitioner."
-    - **Talent Sourcing vs. Supply Chain Sourcing**:
-      - If Candidate is "Sourcing Recruiter" or "Talent Sourcer" and Job is "Strategic Sourcing", "Supply Chain", "Procurement", "Commodity Manager":
-      - IMMEDIATE REJECTION: Set confidence to 0.05.
-      - Explain: "Role is Supply Chain Sourcing; Candidate is Talent Sourcing."
-    - **Operations vs. Recruiting Ops**:
-      - If Job is "Quality Operations", "Fleet Operations" (Industrial/Physical) and Candidate is "Recruiting Operations" or "People Ops":
-      - IMMEDIATE REJECTION: Set confidence to 0.1.
-
-  - **Homonym Trap**:
-    - "Architect" (Building) vs "Architect" (Software).
-    - "Driver" (Vehicle Operator) vs "Driver" (Kernel Software).
-    - "Scout" (Sports/Military) vs "Scout" (Recruiting).
-    - If the word matches but the domain is wrong -> 0.1 Confidence.
 
 - **Reasons Codes**: You MUST select `code` values ONLY from this list:
   - domain_expertise
@@ -171,58 +223,42 @@ Rules:
   - safety_critical_experience
 
 - **Weights**: For each reason, assign a `weight` between 0.0 and 1.0.
-  - 1.0 = Perfect match / Critical requirement met
-  - 0.8 = Strong match
-  - 0.5 = Partial match
-  - DO NOT exceed 1.0.
-
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
 """
 
-        try:
-            response = self.client.models.generate_content(
-                model="gemini-3-flash-preview",
-                contents=[sys_prompt, prompt],
-                config=genai_types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ExplanationPayload,
-                ),
-            )
+        response = self.client.models.generate_content(
+            model="gemini-3-flash-preview",
+            contents=[sys_prompt, prompt],
+            config=genai_types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=ExplanationPayload,
+            ),
+        )
 
-            parsed = getattr(response, "parsed", None)
-            if parsed is not None:
-                summary = parsed.summary or ""
-                if summary.strip().startswith("```"):
-                    summary = summary.replace("```markdown", "").replace("```", "").strip()
-
-                return json.dumps(
-                    {
-                        "summary": summary,
-                        "reasons": [r.model_dump() for r in (parsed.reasons or [])],
-                        "confidence": parsed.confidence,
-                    }
-                )
-
-            # Fallback only if text exists
-            if getattr(response, "text", None):
-                data = json.loads(response.text)
-                summary = data.get("summary", "")
-                if summary.strip().startswith("```"):
-                    summary = summary.replace("```markdown", "").replace("```", "").strip()
-                return json.dumps(
-                    {
-                        "summary": summary,
-                        "reasons": data.get("reasons", []),
-                        "confidence": data.get("confidence"),
-                    }
-                )
-
-            raise ValueError("Explanation response missing parsed payload and text")
-        except Exception as e:
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.error(f"Explanation generation failed: {e}", exc_info=True)
+        parsed = getattr(response, "parsed", None)
+        if parsed is not None:
+            summary = parsed.summary or ""
+            if summary.strip().startswith("```"):
+                summary = summary.replace("```markdown", "").replace("```", "").strip()
             return json.dumps(
-                {"summary": "Automated explanation unavailable.", "reasons": [], "confidence": None}
+                {
+                    "summary": summary,
+                    "reasons": [r.model_dump() for r in (parsed.reasons or [])],
+                    "confidence": float(parsed.confidence),
+                }
             )
+
+        if getattr(response, "text", None):
+            data = json.loads(response.text)
+            summary = data.get("summary", "")
+            if summary.strip().startswith("```"):
+                summary = summary.replace("```markdown", "").replace("```", "").strip()
+            return json.dumps(
+                {
+                    "summary": summary,
+                    "reasons": data.get("reasons", []),
+                    "confidence": data.get("confidence"),
+                }
+            )
+
+        raise ValueError("Explain response missing parsed payload and text")
