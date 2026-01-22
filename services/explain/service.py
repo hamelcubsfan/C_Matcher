@@ -2,69 +2,64 @@
 from __future__ import annotations
 
 import json
-from typing import List
+from typing import List, Literal
 
 from google import genai
 from google.genai import types as genai_types
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from google.genai.errors import ServerError
+from pydantic import BaseModel, Field
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+
+
+ReasonCode = Literal[
+    "domain_expertise",
+    "technical_skills",
+    "leadership_experience",
+    "product_commercialization",
+    "education",
+    "patents",
+    "seniority_match",
+    "cultural_fit",
+    "safety_critical_experience",
+]
+
+
+class ExplanationReason(BaseModel):
+    code: ReasonCode
+    evidence: List[str] = Field(default_factory=list)
+    weight: float
+
+
+class ExplanationPayload(BaseModel):
+    summary: str
+    reasons: List[ExplanationReason]
+    confidence: float
 
 
 class ExplanationService:
     def __init__(self):
         from services.shared.config import get_settings
+
         settings = get_settings()
         self.client = genai.Client(api_key=settings.gemini_api_key)
-        self.schema = {
-            "type": "object",
-            "properties": {
-                "summary": {"type": "string"},
-                "reasons": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "code": {
-                                "type": "string",
-                                "enum": [
-                                    "domain_expertise",
-                                    "technical_skills",
-                                    "leadership_experience",
-                                    "product_commercialization",
-                                    "education",
-                                    "patents",
-                                    "seniority_match",
-                                    "cultural_fit",
-                                    "safety_critical_experience",
-                                ],
-                            },
-                            "evidence": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                            },
-                            "weight": {"type": "number"},
-                        },
-                        "required": ["code", "weight"],
-                    },
-                },
-                "confidence": {"type": "number"},
-            },
-            "required": ["summary", "reasons", "confidence"],
-        }
 
     @retry(
-        stop=stop_after_attempt(12),
-        wait=wait_exponential(multiplier=2, min=4, max=60),
-        retry=retry_if_exception_type(ServerError)
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(ServerError),
     )
     def explain(
         self,
-        resume_spans: list[str],
-        job_spans: list[str],
+        resume_spans: str,
+        job_spans: str,
         must_haves: list[str],
         job_title: str,
     ) -> str:
-        sys_prompt = "You are a Principal Technical Recruiter writing a factual briefing for a Hiring Manager. Focus on evidence-based assessment, not persuasion."
+        sys_prompt = (
+            "You are a Principal Technical Recruiter writing a factual briefing for a Hiring Manager. "
+            "Focus on evidence-based assessment, not persuasion."
+        )
+
         prompt = f"""
 Job Title: {job_title}
 
@@ -116,13 +111,13 @@ Rules:
     - **Level Mapping** (use this for Waymo roles):
       - Job requires "5-7 years" or "7+ years" without "Staff"/"Principal"/"Director" → L4/L5 (Senior SWE)
       - Job requires "8-12 years" or has "Staff" in title → L5/L6 (Staff)
-      - Job has "Principal" or "Distinguished" in title → L6+ (Principal/Distinguished)
+      - Job has "Principal" or "Fellow" in title → L6+ (Principal/Fellow)
       - Job has "Director" or "Head of" in title → Leadership track (not IC)
     - **Over-Qualification Rules**:
-      - If Candidate has 20+ years of experience OR previous Director/VP/C-level titles AND Job is L4/L5 (just "Senior SWE", "7+ years req"): **PENALIZE confidence to max 0.3**.
+      - If Candidate has 20+ years of experience OR previous Director/VP/C-level titles AND Job is L4/L5 (just "Senior SWE", "7+ years req"): PENALIZE confidence to max 0.3.
       - Explain: "Candidate is significantly over-qualified (L6+ profile for an L4/L5 role)."
-      - If Candidate has 15+ years experience AND Job is L4/L5: **PENALIZE confidence to max 0.4**.
-      - If Candidate has "Staff" or "Principal" in current title AND Job is standard "Senior" without Staff/Principal prefix: **PENALIZE confidence to max 0.5**.
+      - If Candidate has 15+ years experience AND Job is L4/L5: PENALIZE confidence to max 0.4.
+      - If Candidate has "Staff" or "Principal" in current title AND Job is standard "Senior" without Staff/Principal prefix: PENALIZE confidence to max 0.5.
   - **PhD + Leadership**: If Candidate has a PhD and 3+ years of leadership/mentorship, they are likely qualified for "Tech Lead" or "Manager" roles. Do NOT penalize for lack of formal "Manager" title if they have this.
   - Explicitly mention seniority mismatch in "Potential Gaps".
 - **CRITICAL**: Check for Technical Domain Mismatch.
@@ -132,7 +127,7 @@ Rules:
   - Do NOT let generic skills (Python, C++) override a lack of specific domain expertise.
   - **Practitioner vs. Adjacent Experience Check**:
     - CRITICAL: Distinguish between *doing* the work (verbs: built, coded, designed, implemented, deployed) and *supporting* the work (verbs: hired, sourced, sold, managed project, partnered with).
-    - **Title Ambiguity Trap**: If the Candidate's title contains "Talent", "Recruiting", "Sourcing", or "Staffing" (e.g. "Staff Researcher - Talent", "Engineering Manager - Recruiting"), they are **NOT** a Practitioner.
+    - **Title Ambiguity Trap**: If the Candidate's title contains "Talent", "Recruiting", "Sourcing", or "Staffing" (e.g. "Staff Researcher - Talent", "Engineering Manager - Recruiting"), they are NOT a Practitioner.
       - "Staff Researcher - Talent" == Recruiter.
       - "Engineering Recruiter" == Recruiter.
     - If the Job requires a Practitioner (Engineer, Scientist) and the Candidate is a Recruiter/Sourcer (even with "Staff" or "Principal" titles), they are NOT a match.
@@ -148,32 +143,32 @@ Rules:
 
   - **CRITICAL: Role Family Mismatch (The "Recruiter Trap")**:
     - **Recruiter vs. Engineer**: If the Candidate is a Recruiter/Sourcer/Talent Partner (even "Technical Recruiter") and the Job is an Engineering/Science/Product role (e.g. "Software Engineer", "Data Scientist", "Product Manager"):
-      - **IMMEDIATE REJECTION**: Set confidence to **0.05**.
+      - IMMEDIATE REJECTION: Set confidence to 0.05.
       - Explain: "Candidate is a Recruiter, not a Practitioner."
     - **Talent Sourcing vs. Supply Chain Sourcing**:
       - If Candidate is "Sourcing Recruiter" or "Talent Sourcer" and Job is "Strategic Sourcing", "Supply Chain", "Procurement", "Commodity Manager":
-      - **IMMEDIATE REJECTION**: Set confidence to **0.05**.
+      - IMMEDIATE REJECTION: Set confidence to 0.05.
       - Explain: "Role is Supply Chain Sourcing; Candidate is Talent Sourcing."
     - **Operations vs. Recruiting Ops**:
       - If Job is "Quality Operations", "Fleet Operations" (Industrial/Physical) and Candidate is "Recruiting Operations" or "People Ops":
-      - **IMMEDIATE REJECTION**: Set confidence to **0.1**.
+      - IMMEDIATE REJECTION: Set confidence to 0.1.
 
   - **Homonym Trap**:
     - "Architect" (Building) vs "Architect" (Software).
     - "Driver" (Vehicle Operator) vs "Driver" (Kernel Software).
     - "Scout" (Sports/Military) vs "Scout" (Recruiting).
-    - If the word matches but the domain is wrong -> **0.1 Confidence**.
+    - If the word matches but the domain is wrong -> 0.1 Confidence.
 
 - **Reasons Codes**: You MUST select `code` values ONLY from this list:
-  - `domain_expertise`
-  - `technical_skills`
-  - `leadership_experience`
-  - `product_commercialization`
-  - `education`
-  - `patents`
-  - `seniority_match`
-  - `cultural_fit`
-  - `safety_critical_experience`
+  - domain_expertise
+  - technical_skills
+  - leadership_experience
+  - product_commercialization
+  - education
+  - patents
+  - seniority_match
+  - cultural_fit
+  - safety_critical_experience
 
 - **Weights**: For each reason, assign a `weight` between 0.0 and 1.0.
   - 1.0 = Perfect match / Critical requirement met
@@ -183,47 +178,51 @@ Rules:
 
 - **ANONYMIZATION**: NEVER use the candidate's real name. Always refer to them as "The Candidate" or "TC".
 """
+
         try:
-            try:
-                response = self.client.models.generate_content(
-                    model="gemini-3-flash-preview",
-                    contents=[sys_prompt, prompt],
-                    config=genai_types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        response_schema=self.schema,
-                    ),
+            response = self.client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=[sys_prompt, prompt],
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=ExplanationPayload,
+                ),
+            )
+
+            parsed = getattr(response, "parsed", None)
+            if parsed is not None:
+                summary = parsed.summary or ""
+                if summary.strip().startswith("```"):
+                    summary = summary.replace("```markdown", "").replace("```", "").strip()
+
+                return json.dumps(
+                    {
+                        "summary": summary,
+                        "reasons": [r.model_dump() for r in (parsed.reasons or [])],
+                        "confidence": parsed.confidence,
+                    }
                 )
-            except ServerError:
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.warning("Gemini 3 Flash primary call failed, retrying...")
-                response = self.client.models.generate_content(
-                    model="gemini-3-flash-preview",
-                    contents=[sys_prompt, prompt],
-                    config=genai_types.GenerateContentConfig(
-                        response_mime_type="application/json",
-                        response_schema=self.schema,
-                    ),
+
+            # Fallback only if text exists
+            if getattr(response, "text", None):
+                data = json.loads(response.text)
+                summary = data.get("summary", "")
+                if summary.strip().startswith("```"):
+                    summary = summary.replace("```markdown", "").replace("```", "").strip()
+                return json.dumps(
+                    {
+                        "summary": summary,
+                        "reasons": data.get("reasons", []),
+                        "confidence": data.get("confidence"),
+                    }
                 )
-            data = json.loads(response.text)
-            summary = data.get("summary", "")
-            # Guard against the model wrapping the inner string in markdown code blocks
-            if summary.strip().startswith("```"):
-                summary = summary.replace("```markdown", "").replace("```", "").strip()
-            
-            reasons = data.get("reasons", [])
-            confidence = data.get("confidence")
+
+            raise ValueError("Explanation response missing parsed payload and text")
         except Exception as e:
             import logging
+
             logger = logging.getLogger(__name__)
             logger.error(f"Explanation generation failed: {e}", exc_info=True)
-            summary = "Automated explanation unavailable."
-            reasons = []
-            confidence = None
-        return json.dumps(
-            {
-                "summary": summary,
-                "reasons": reasons,
-                "confidence": confidence,
-            }
-        )
+            return json.dumps(
+                {"summary": "Automated explanation unavailable.", "reasons": [], "confidence": None}
+            )
