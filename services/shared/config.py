@@ -4,6 +4,8 @@ from __future__ import annotations
 import os
 import sys
 from dataclasses import dataclass
+from functools import lru_cache
+from urllib.parse import urlsplit, urlunsplit
 
 
 @dataclass
@@ -23,7 +25,7 @@ class Settings:
 
     rerank_provider: str = os.getenv("RERANK_PROVIDER", "local")
 
-    database_url: str = ""  # This will be set by get_settings()
+    database_url: str = ""  # populated by get_settings()
 
     upload_root: str = os.getenv("UPLOAD_ROOT", "/tmp" if os.getenv("VERCEL") else "uploads")
 
@@ -31,11 +33,26 @@ class Settings:
     web_static_dir: str | None = os.getenv("WEB_STATIC_DIR", "apps/web/out")
 
 
-import sys
+def _redact_db_url(url: str) -> str:
+    """Remove password from DATABASE_URL before printing to logs."""
+    try:
+        parts = urlsplit(url)
+        if not parts.scheme or not parts.netloc:
+            return "<set>"
+
+        username = parts.username or ""
+        host = parts.hostname or ""
+        port = f":{parts.port}" if parts.port else ""
+        auth = f"{username}:***@" if username else ""
+        netloc = f"{auth}{host}{port}"
+        return urlunsplit((parts.scheme, netloc, parts.path, parts.query, parts.fragment))
+    except Exception:
+        return "<set>"
 
 
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Creates a settings object and populates the database_url."""
+    """Create and cache settings, including database_url."""
     settings = Settings()
 
     if "DATABASE_URL" in os.environ:
@@ -45,33 +62,31 @@ def get_settings() -> Settings:
         elif db_url.startswith("postgresql://"):
             db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
         settings.database_url = db_url
-        print(f"DATABASE_URL set from environment: {settings.database_url}", file=sys.stderr)
+        print(
+            f"DATABASE_URL set from environment: {_redact_db_url(settings.database_url)}",
+            file=sys.stderr,
+        )
     elif "PGHOST" in os.environ:
-        # Assumes standard PostgreSQL environment variables are set.
         user = os.environ.get("PGUSER", "postgres")
         password = os.environ.get("PGPASSWORD")
         host = os.environ["PGHOST"]
         port = os.environ.get("PGPORT", 5432)
         dbname = os.environ.get("PGDATABASE", "roles")
 
-        if password:
-            auth = f"{user}:{password}"
-        else:
-            auth = user
+        auth = f"{user}:{password}" if password else user
         settings.database_url = f"postgresql+psycopg2://{auth}@{host}:{port}/{dbname}"
     else:
-        # Default for local development
-        print("WARNING: DATABASE_URL not found in environment. Available keys:", list(os.environ.keys()), file=sys.stderr)
+        print("DATABASE_URL not found in environment. Using local fallback.", file=sys.stderr)
         settings.database_url = "postgresql+psycopg2://postgres:postgres@localhost:5432/roles"
 
     try:
         os.makedirs(settings.upload_root, exist_ok=True)
     except OSError as e:
-        # Check for Read-only file system (errno 30)
         if e.errno == 30:
-            print(f"Warning: {settings.upload_root} is read-only. Falling back to /tmp", file=sys.stderr)
+            print(f"{settings.upload_root} is read-only. Falling back to /tmp", file=sys.stderr)
             settings.upload_root = "/tmp"
             os.makedirs(settings.upload_root, exist_ok=True)
         else:
             raise
+
     return settings
