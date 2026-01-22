@@ -1,16 +1,17 @@
 """Candidate/job matching pipeline."""
 from __future__ import annotations
 
+import os
+import time
 import uuid
+from typing import Iterator
 
-from sqlalchemy import func, select, cast
+import concurrent.futures
+from concurrent.futures import FIRST_COMPLETED, wait
+
+from sqlalchemy import cast, func, select
 from sqlalchemy.orm import Session
 from pgvector.sqlalchemy import Vector
-
-try:  # pragma: no cover - optional dependency surface
-    from pgvector.sqlalchemy import CosineDistance  # type: ignore
-except ImportError:  # Render's pgvector build omits this helper
-    CosineDistance = None  # type: ignore
 
 from services.explain.service import ExplanationService
 from services.match.rerank import get_reranker
@@ -21,6 +22,28 @@ from services.shared.resume import chunk_with_labels, summarize_text
 from services.shared.schemas import MatchResult
 
 _settings = get_settings()
+
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        return int(os.getenv(name, str(default)))
+    except Exception:
+        return default
+
+
+def _env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except Exception:
+        return default
+
+
+MAX_JOBS_TO_CHECK = _env_int("MAX_JOBS_TO_CHECK", 25)
+EXPLAIN_WORKERS = _env_int("EXPLAIN_WORKERS", 4)
+EXPLAIN_STAGE_TIMEOUT_S = _env_float("EXPLAIN_STAGE_TIMEOUT_S", 120.0)
+MATCH_TOTAL_BUDGET_S = _env_float("MATCH_TOTAL_BUDGET_S", 240.0)
+MIN_LLM_CONFIDENCE = _env_float("MIN_LLM_CONFIDENCE", 0.7)
+
 
 class MatchService:
     def __init__(self, session: Session):
@@ -38,39 +61,6 @@ class MatchService:
         candidate.embedding = embedding
         self.session.add(candidate)
         self.session.flush()
-
-    def retrieve_jobs(self, candidate: Candidate, limit: int = 10) -> list[tuple[Job, float]]:
-        vector = candidate.embedding
-        if vector is None:
-            raise RuntimeError("Candidate embedding missing")
-        
-        # Ensure vector is a list, not a numpy array, for psycopg adaptation
-        if hasattr(vector, "tolist"):
-            vector = vector.tolist()
-            
-        print(f"DEBUG: Vector start: {vector[:5]}", flush=True)
-            
-        # Force explicit cast and function call to match debug script
-        # if CosineDistance is not None:
-        #     distance = CosineDistance(Job.embedding, vector)
-        # else:
-        # Explicitly cast the list to a Vector type so Postgres knows which function to use
-        distance = func.cosine_distance(Job.embedding, cast(vector, Vector(_settings.embed_dim)))
-        stmt = (
-            select(Job, (1 - distance).label("similarity"))
-            # .where(Job.posting_status == "open")
-            .where(Job.embedding.is_not(None))
-            .order_by(distance.asc())
-            .limit(50)
-        )
-        rows = self.session.execute(stmt).all()
-        
-        # DEBUG: Print raw retrieval results
-        print(f"DEBUG: Raw retrieval count: {len(rows)}", flush=True)
-        for i, row in enumerate(rows[:5]):
-            print(f"DEBUG: Raw Rank {i+1}: Job {row[0].id} ({row[0].title}) - Sim: {row[1]:.4f}", flush=True)
-            
-        return [(row[0], float(row[1])) for row in rows]
 
     def rerank(self, candidate: Candidate, jobs: list[Job]) -> list[float]:
         candidate_text = candidate.parsed_profile.get("raw_text", "") if candidate.parsed_profile else ""
@@ -90,94 +80,74 @@ class MatchService:
             job_title=job.title,
         )
 
-    def build_matches(self, candidate: Candidate, top_k: int = 5) -> list[MatchResult]:
+    def build_matches(self, candidate: Candidate, top_k: int = 5) -> Iterator[dict]:
+        import json
         import logging
+
         logger = logging.getLogger(__name__)
-        
+        start_total = time.monotonic()
+
         try:
             print(f"DEBUG: Building matches for candidate {candidate.id}", flush=True)
-            
-            # 1. Query Expansion: Get diverse search angles
+
             yield {"status": "Generating search queries...", "progress": 5}
             from services.shared.resume import generate_search_queries
+
             candidate_text = candidate.parsed_profile.get("raw_text", "")
             candidate_skills = candidate.skills or []
             queries = generate_search_queries(candidate_text, candidate_skills)
-            
-            # 2. Embed all queries
+
+            if time.monotonic() - start_total > MATCH_TOTAL_BUDGET_S:
+                yield {"status": "Timed out early (query gen).", "progress": 100, "data": []}
+                return
+
             yield {"status": "Embedding search queries...", "progress": 10}
             query_embeddings = embed_texts(queries, task_type="RETRIEVAL_QUERY")
-            
-            # 3. Multi-Vector Retrieval
+
             yield {"status": "Retrieving jobs from vector database...", "progress": 15}
             all_retrieved: dict[int, tuple[Job, float]] = {}
-            
+
             for i, embedding in enumerate(query_embeddings):
-                # Create a temporary candidate object for retrieval (hacky but works with existing method)
-                # Or better, refactor retrieve_jobs to take a vector. 
-                # For now, let's just call the lower-level logic directly or update retrieve_jobs.
-                # Let's update retrieve_jobs to take an optional vector override.
-                
-                # Actually, let's just do the search here to avoid breaking the interface yet
                 vector = embedding
                 if hasattr(vector, "tolist"):
                     vector = vector.tolist()
-                
+
                 distance = func.cosine_distance(Job.embedding, cast(vector, Vector(_settings.embed_dim)))
                 stmt = (
                     select(Job, (1 - distance).label("similarity"))
                     .where(Job.embedding.is_not(None))
                     .order_by(distance.asc())
-                    .limit(25) # Fetch top 25 for EACH query
+                    .limit(25)
                 )
                 rows = self.session.execute(stmt).all()
-                
+
                 print(f"DEBUG: Query '{queries[i]}' retrieved {len(rows)} jobs", flush=True)
-                
+
                 for row in rows:
                     job, score = row[0], float(row[1])
-                    # Keep the HIGHEST score if found multiple times
                     if job.id not in all_retrieved or score > all_retrieved[job.id][1]:
                         all_retrieved[job.id] = (job, score)
 
+                if time.monotonic() - start_total > MATCH_TOTAL_BUDGET_S:
+                    break
+
             jobs = [item[0] for item in all_retrieved.values()]
             retrieval_scores = [item[1] for item in all_retrieved.values()]
-            
+
             print(f"DEBUG: Total unique jobs after merge: {len(jobs)}", flush=True)
-            
+
             if not jobs:
-                print("DEBUG: No jobs retrieved from DB", flush=True)
                 yield {"status": "No jobs found.", "progress": 100, "data": []}
                 return
 
             yield {"status": "Reranking candidates...", "progress": 25}
             rerank_scores = self.rerank(candidate, list(jobs))
-            
             scored = list(zip(jobs, retrieval_scores, rerank_scores))
-            
-            # DEBUG: Print rerank scores for top 5 vector matches
-            for i in range(min(5, len(scored))):
-                job, ret, rer = scored[i]
-                print(f"DEBUG: Job {job.id} ({job.title}) - Retrieval: {ret:.4f}, Rerank: {rer:.4f}", flush=True)
 
-            # CRITICAL FIX: The reranker is burying the Recruiter jobs. 
-            # We trust the vector search (which put them at #1, #2, #3).
-            # We will NOT sort by rerank score for the cutoff. We will keep retrieval order.
-            # scored.sort(key=lambda x: x[2], reverse=True)
-            
-            # Don't truncate to top_k yet! We need to find top_k *valid* matches.
-            # FOMO FIX: We will check MORE candidates (50) and NOT stop early.
-            # We want to find the absolute best matches in the pool, not just the first 5 good ones.
-            candidates_to_check = scored[:50]
+            candidates_to_check = scored[:MAX_JOBS_TO_CHECK]
             total_to_check = len(candidates_to_check)
-            
-            import json
-            
-            # Parallelize explanation generation
-            import concurrent.futures
-            
-            # Helper function for parallel execution
-            def process_match(job, retrieval_score, rerank_score):
+
+            def process_match(job: Job, retrieval_score: float, rerank_score: float):
                 try:
                     explanation_json = self.explain(candidate, job)
                     return job, retrieval_score, rerank_score, explanation_json
@@ -186,94 +156,113 @@ class MatchService:
                     return job, retrieval_score, rerank_score, None
 
             results: list[MatchResult] = []
-            
-            # Use ThreadPoolExecutor with max_workers=8 to respect rate limits
-            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
-                # Submit all tasks
-                future_to_job = {
-                    executor.submit(process_match, job, ret, rer): job 
-                    for job, ret, rer in candidates_to_check
-                }
-                
-                completed_count = 0
-                for future in concurrent.futures.as_completed(future_to_job):
-                    completed_count += 1
-                    # Calculate progress from 30% to 95%
-                    current_progress = 30 + int((completed_count / total_to_check) * 65)
-                    yield {"status": f"Analyzing matches ({completed_count}/{total_to_check})...", "progress": current_progress}
-                    
+
+            yield {"status": f"Analyzing matches (0/{total_to_check})...", "progress": 30}
+
+            start_explain = time.monotonic()
+            checked = 0
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=EXPLAIN_WORKERS) as executor:
+                it = iter(candidates_to_check)
+                pending: set[concurrent.futures.Future] = set()
+
+                def submit_next():
+                    nonlocal pending
                     try:
-                        job, retrieval_score, rerank_score, explanation_json = future.result()
-                        
-                        if not explanation_json:
-                            continue
+                        job, ret, rer = next(it)
+                    except StopIteration:
+                        return False
+                    pending.add(executor.submit(process_match, job, ret, rer))
+                    return True
 
-                        # Parse the JSON explanation to get structured data
+                for _ in range(EXPLAIN_WORKERS):
+                    if not submit_next():
+                        break
+
+                while pending:
+                    elapsed_total = time.monotonic() - start_total
+                    elapsed_explain = time.monotonic() - start_explain
+                    if elapsed_total > MATCH_TOTAL_BUDGET_S or elapsed_explain > EXPLAIN_STAGE_TIMEOUT_S:
+                        break
+
+                    done, pending = wait(pending, timeout=1.0, return_when=FIRST_COMPLETED)
+                    if not done:
+                        continue
+
+                    for future in done:
+                        checked += 1
+                        current_progress = 30 + int((checked / max(total_to_check, 1)) * 65)
+                        yield {
+                            "status": f"Analyzing matches ({checked}/{total_to_check})...",
+                            "progress": min(current_progress, 95),
+                        }
+
                         try:
-                            explanation_data = json.loads(explanation_json)
-                            summary = explanation_data.get("summary", "No summary available.")
-                            llm_confidence = explanation_data.get("confidence")
-                            reason_codes = explanation_data.get("reasons", [])
-                        except json.JSONDecodeError:
-                            logger.warning("Failed to parse explanation JSON", exc_info=True)
-                            print(f"DEBUG: Failed to parse JSON for Job {job.id}", flush=True)
-                            summary = explanation_json
-                            llm_confidence = None
-                            reason_codes = []
+                            job, retrieval_score, rerank_score, explanation_json = future.result()
+                            if not explanation_json:
+                                continue
 
-                        # Filter out low confidence matches based on LLM assessment
-                        if llm_confidence is not None:
-                            print(f"DEBUG: Job {job.id} ({job.title}): LLM confidence {llm_confidence}", flush=True)
-                        else:
-                            print(f"DEBUG: Job {job.id} ({job.title}): No LLM confidence returned", flush=True)
+                            try:
+                                explanation_data = json.loads(explanation_json)
+                                summary = explanation_data.get("summary", "No summary available.")
+                                llm_confidence = explanation_data.get("confidence")
+                                reason_codes = explanation_data.get("reasons", [])
+                            except json.JSONDecodeError:
+                                logger.warning("Failed to parse explanation JSON", exc_info=True)
+                                summary = explanation_json
+                                llm_confidence = None
+                                reason_codes = []
 
-                        # Filter by LLM confidence
-                        # User requested strict filtering: only return GOOD matches (> 0.7)
-                        if llm_confidence is None or llm_confidence < 0.7:
-                            print(f"DEBUG: Skipping match for job {job.id} due to low/missing LLM confidence: {llm_confidence}", flush=True)
-                            continue
+                            if llm_confidence is None or llm_confidence < MIN_LLM_CONFIDENCE:
+                                continue
 
-                        # Use LLM confidence if available, otherwise fall back to retrieval/rerank average
-                        if llm_confidence is not None:
                             confidence = llm_confidence
-                        else:
-                            confidence = (retrieval_score + rerank_score) / 2 if rerank_score is not None else retrieval_score
-                        
-                        match = (
-                            self.session.query(Match)
-                            .filter(Match.candidate_id == candidate.id, Match.job_id == job.id)
-                            .one_or_none()
-                        )
-                        if match is None:
-                            match = Match(candidate_id=candidate.id, job_id=job.id)
-                        match.retrieval_score = retrieval_score
-                        match.rerank_score = rerank_score
-                        match.confidence = confidence
-                        match.explanation = summary  # Store the clean text summary
-                        match.reason_codes = reason_codes
-                        self.session.add(match)
-                        results.append(
-                            MatchResult(
-                                job=job,
-                                retrieval_score=retrieval_score,
-                                rerank_score=rerank_score,
-                                confidence=confidence,
-                                explanation=summary, # Return the clean text summary
-                                reason_codes=reason_codes,
+
+                            match = (
+                                self.session.query(Match)
+                                .filter(Match.candidate_id == candidate.id, Match.job_id == job.id)
+                                .one_or_none()
                             )
-                        )
-                    except Exception as e:
-                        logger.error(f"Exception in worker thread: {e}", exc_info=True)
-            
-            # Sort by confidence descending so the best matches are first
+                            if match is None:
+                                match = Match(candidate_id=candidate.id, job_id=job.id)
+
+                            match.retrieval_score = retrieval_score
+                            match.rerank_score = rerank_score
+                            match.confidence = confidence
+                            match.explanation = summary
+                            match.reason_codes = reason_codes
+                            self.session.add(match)
+
+                            results.append(
+                                MatchResult(
+                                    job=job,
+                                    retrieval_score=retrieval_score,
+                                    rerank_score=rerank_score,
+                                    confidence=confidence,
+                                    explanation=summary,
+                                    reason_codes=reason_codes,
+                                )
+                            )
+
+                            # Early exit once we have enough good matches
+                            if len(results) >= top_k:
+                                pending.clear()
+                                break
+                        except Exception as e:
+                            logger.error(f"Exception in worker thread: {e}", exc_info=True)
+
+                    # Keep the worker pool full
+                    while len(pending) < EXPLAIN_WORKERS:
+                        if not submit_next():
+                            break
+
+                # Best effort cancel (only cancels futures not started)
+                for f in pending:
+                    f.cancel()
+
             results.sort(key=lambda x: x.confidence or 0, reverse=True)
-            
-            # NOW we truncate to top_k, ensuring we kept the BEST ones
             results = results[:top_k]
-            
-            logger.info(f"Returning {len(results)} matches")
-            
-            # Final yield with data
+
             yield {"status": "Complete", "progress": 100, "data": [r.model_dump() for r in results]}
         except Exception as e:
             logger.error(f"Error building matches: {e}", exc_info=True)
